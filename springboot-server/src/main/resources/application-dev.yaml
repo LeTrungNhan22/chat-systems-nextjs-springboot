@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://root:root@cluster0.ecv8yuh.mongodb.net/spring-chat-app?ssl=true&authSource=admin
+# The configuration for the OAuth2 client
+app:
+  tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
+  tokenExpirationMsec: 864000000
+  authorizedRedirectUris:
+    - http://localhost:3000/oauth2/redirect

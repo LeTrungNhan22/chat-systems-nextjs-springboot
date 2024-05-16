@@ -1,0 +1,22 @@
+version: '5'
+services:
+  snowing:
+    image: mongo:latest
+    container_name: snowing
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+
+  springbootoauth2docker:
+    image: springbootoauth2docker:latest
+    container_name: springbootoauth2docker
+    ports:
+      - 9090:8080
+    links:
+      - snowing
+volumes:
+  mongodb_data_container:
