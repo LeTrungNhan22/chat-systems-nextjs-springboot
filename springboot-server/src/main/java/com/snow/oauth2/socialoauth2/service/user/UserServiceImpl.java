@@ -1,23 +1,32 @@
 package com.snow.oauth2.socialoauth2.service.user;
 
 
-import com.snow.oauth2.socialoauth2.exception.ResourceNotFoundException;
-import com.snow.oauth2.socialoauth2.model.User;
+import com.snow.oauth2.socialoauth2.dto.request.user.UserDto;
+import com.snow.oauth2.socialoauth2.dto.request.user.UserFilterRequestDto;
+import com.snow.oauth2.socialoauth2.exception.auth.ResourceNotFoundException;
+import com.snow.oauth2.socialoauth2.model.user.User;
 import com.snow.oauth2.socialoauth2.repository.UserRepository;
 import com.snow.oauth2.socialoauth2.security.UserPrincipal;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
-@RequiredArgsConstructor
+
 public class UserServiceImpl implements UserService {
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
-    private final UserRepository userRepository;
+    @Autowired
+    private  UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -36,5 +45,42 @@ public class UserServiceImpl implements UserService {
         );
 
         return UserPrincipal.create(user);
+    }
+
+    @Override
+    public List<UserDto> filterUsers(UserFilterRequestDto filterRequestDto) {
+        if (filterRequestDto == null || filterRequestDto.getEmail() == null || filterRequestDto.getEmail().isEmpty()) {
+            List<User> allUsers = userRepository.findAll();
+            return allUsers.stream()
+                    .map(this::convertToUserDto)
+                    .collect(Collectors.toList());
+        } else {
+            String emailFilter = filterRequestDto.getEmail();
+            List<User> filteredUsers = userRepository.findByEmailContainingIgnoreCase(emailFilter);
+            return filteredUsers.stream()
+                    .map(this::convertToUserDto)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    @Override
+    public UserDto getUserById(String id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", id)
+        );
+        return convertToUserDto(user);
+    }
+
+    private UserDto convertToUserDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setUsername(user.getUsername());
+        userDto.setEmail(user.getEmail());
+        userDto.setImageUrl(user.getImageUrl());
+        userDto.setProviderType(user.getProviderType());
+        userDto.setProviderId(user.getProviderId());
+        userDto.setCreatedAt(user.getCreatedAt());
+        userDto.setUpdatedAt(user.getUpdatedAt());
+        return userDto;
     }
 }

@@ -11,6 +11,7 @@ spring:
             scope:
               - email
               - profile
+#context-path: /api
+server:
+  port: 8080
 
-
-#

@@ -1,6 +1,6 @@
 package com.snow.oauth2.socialoauth2.security;
 
-import com.snow.oauth2.socialoauth2.model.User;
+import com.snow.oauth2.socialoauth2.model.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

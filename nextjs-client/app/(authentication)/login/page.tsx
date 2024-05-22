@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { UserAuthForm } from "@/components/auth/use-auth-form";
+import { UserAuthForm } from "@/app/(authentication)/_components/use-auth-form";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 export default function LoginPage() {

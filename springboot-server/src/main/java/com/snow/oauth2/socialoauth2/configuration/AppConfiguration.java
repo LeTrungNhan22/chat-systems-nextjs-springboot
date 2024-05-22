@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Data
@@ -19,4 +20,6 @@ public class AppConfiguration {
     private List<String> authorizedRedirectUris = new ArrayList<>();
     private String tokenSecret;
     private long tokenExpirationMsec;
+
+
 }

@@ -2,7 +2,7 @@
 import React, { useContext } from "react";
 import DesktopNavigation from "./nav/DesktopNavigation";
 import MobileNavigation from "./nav/MobileNavigation";
-import { AuthContext } from "@/context/auth/context-auth";
+import { AuthContext } from "@/app/(authentication)/_context/context-auth";
 
 type Props = React.PropsWithChildren<{}>;
 

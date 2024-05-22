@@ -1,7 +1,7 @@
 package com.snow.oauth2.socialoauth2.security.oauth2;
 
 import com.snow.oauth2.socialoauth2.configuration.AppConfiguration;
-import com.snow.oauth2.socialoauth2.exception.BadRequestException;
+import com.snow.oauth2.socialoauth2.exception.auth.BadRequestException;
 import com.snow.oauth2.socialoauth2.security.TokenProvider;
 import com.snow.oauth2.socialoauth2.utils.CookieUtils;
 import jakarta.servlet.ServletException;

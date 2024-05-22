@@ -1,7 +1,7 @@
 package com.snow.oauth2.socialoauth2.security.oauth2.user;
 
-import com.snow.oauth2.socialoauth2.exception.OAuth2AuthenticationProcessingException;
-import com.snow.oauth2.socialoauth2.model.ProviderType;
+import com.snow.oauth2.socialoauth2.exception.auth.OAuth2AuthenticationProcessingException;
+import com.snow.oauth2.socialoauth2.model.user.ProviderType;
 
 import java.util.Map;
 

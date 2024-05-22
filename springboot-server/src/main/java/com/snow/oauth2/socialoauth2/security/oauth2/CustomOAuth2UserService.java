@@ -1,9 +1,9 @@
 package com.snow.oauth2.socialoauth2.security.oauth2;
 
 
-import com.snow.oauth2.socialoauth2.exception.OAuth2AuthenticationProcessingException;
-import com.snow.oauth2.socialoauth2.model.ProviderType;
-import com.snow.oauth2.socialoauth2.model.User;
+import com.snow.oauth2.socialoauth2.exception.auth.OAuth2AuthenticationProcessingException;
+import com.snow.oauth2.socialoauth2.model.user.ProviderType;
+import com.snow.oauth2.socialoauth2.model.user.User;
 import com.snow.oauth2.socialoauth2.repository.UserRepository;
 import com.snow.oauth2.socialoauth2.security.UserPrincipal;
 import com.snow.oauth2.socialoauth2.security.oauth2.user.OAuth2UserInfo;

@@ -80,7 +80,7 @@ const MobileNavigation = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer select-none shadow-sm">
-                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarImage src={`${user?.user.imageUrl}`} />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>

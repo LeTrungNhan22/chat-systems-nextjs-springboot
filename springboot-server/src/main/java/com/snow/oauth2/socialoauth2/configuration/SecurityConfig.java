@@ -74,12 +74,28 @@ public class SecurityConfig {
                                 "/*/*.jpg",
                                 "/*/*.html",
                                 "/*/*.css",
-                                "/*/*.js")
+                                "/*/*.js",
+                                "/api/v1/**",
+                                "/swagger-ui/**",
+                                "/swagger-resources/**",
+                                "/v2/api-docs",
+                                "/v3/api-docs",
+                                "/webjars/**",
+                                "/v3/api-docs/**",
+                                "/configuration/ui",
+                                "/configuration/security",
+                                "/swagger-resources",
+                                "/swagger-resources/**",
+                                "/swagger-ui.html"
+
+                        )
                         .permitAll()
                         .requestMatchers("/auth/**", "/oauth2/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated());
+
+
 
         http.oauth2Login(oauth2 -> oauth2
                 .authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
