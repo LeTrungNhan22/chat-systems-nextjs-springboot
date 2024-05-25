@@ -13,11 +13,15 @@ import java.time.LocalDateTime;
 @Document(collection = "messages")
 public class Message {
     @Id
-    private String Id;
+    private String id;
     @DBRef
     private User sender;
+    @DBRef
+    private User receiver;
     private String messageContent;
-    private LocalDateTime timeStamp;
+    private LocalDateTime timestamp;
+    private MessageStatus status;
+    private MessageType messageType;
     @DBRef
     private Chat chat; // This is the chat to which the message belongs
 

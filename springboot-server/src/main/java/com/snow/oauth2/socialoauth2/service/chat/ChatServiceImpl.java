@@ -1,10 +1,9 @@
 package com.snow.oauth2.socialoauth2.service.chat;
 
-import com.snow.oauth2.socialoauth2.dto.request.chat.ChatDto;
 import com.snow.oauth2.socialoauth2.exception.auth.BadRequestException;
-import com.snow.oauth2.socialoauth2.exception.user.UserNotFoundException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
 import com.snow.oauth2.socialoauth2.model.chat.Chat;
-import com.snow.oauth2.socialoauth2.model.chat.Message;
 import com.snow.oauth2.socialoauth2.model.user.User;
 import com.snow.oauth2.socialoauth2.repository.ChatRepository;
 import com.snow.oauth2.socialoauth2.repository.FriendRepository;
@@ -67,6 +66,37 @@ public class ChatServiceImpl implements ChatService {
         return chatRepository.save(newChat);
     }
 
+    @Override
+    public User getReceiver(String chatId, String senderId) {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ChatNotFoundException(chatId));
+
+        return chat.getParticipants().stream()
+                .filter(user -> !user.getId().equals(senderId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Receiver not found in chat"));
+    }
+
+    @Override
+    public Chat getChatById(String chatId) {
+        return chatRepository.findById(chatId)
+                .orElseThrow(() -> new ChatNotFoundException(chatId));
+    }
+
+    @Override
+    public String getReceiverId(Chat chat, String senderId) {
+        if (chat.isGroupChat()) {
+            // Nếu là nhóm chat, không cần tìm receiverId
+            return null;
+        } else {
+            // Nếu là chat riêng tư, tìm người nhận là người khác với người gửi
+            return chat.getParticipants().stream()
+                    .filter(user -> !user.getId().equals(senderId))
+                    .findFirst()
+                    .map(User::getId)
+                    .orElseThrow(() -> new IllegalStateException("Receiver not found in chat"));
+        }
+    }
 
 
 }

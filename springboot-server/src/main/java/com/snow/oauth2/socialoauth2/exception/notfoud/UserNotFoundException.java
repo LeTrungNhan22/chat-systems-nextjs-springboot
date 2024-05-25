@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.exception.user;
+package com.snow.oauth2.socialoauth2.exception.notfoud;
 
 public class UserNotFoundException extends RuntimeException {
 

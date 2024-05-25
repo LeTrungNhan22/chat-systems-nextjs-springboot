@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.exception;
+package com.snow.oauth2.socialoauth2.exception.notfoud;
 
 public class ResourceNotFoundException extends RuntimeException {
     private String resourceName;

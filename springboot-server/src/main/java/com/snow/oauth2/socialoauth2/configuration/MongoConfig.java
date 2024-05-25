@@ -14,6 +14,6 @@ public class MongoConfig implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        mongoConverter.setTypeMapper(new DefaultMongoTypeMapper(null)); // Không lưu trữ thông tin kiểu dữ liệu
+        mongoConverter.setTypeMapper(new DefaultMongoTypeMapper(null)); // No _class in document
     }
 }

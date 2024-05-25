@@ -1,9 +1,10 @@
 package com.snow.oauth2.socialoauth2.exception.global;
 
+import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.auth.BadRequestException;
-import com.snow.oauth2.socialoauth2.exception.auth.ResourceNotFoundException;
-import com.snow.oauth2.socialoauth2.exception.friend.FriendRequestAlreadyExistsException;
-import com.snow.oauth2.socialoauth2.exception.user.UserNotFoundException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.ResourceNotFoundException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.FriendRequestAlreadyExistsException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -61,6 +62,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBadRequestException(BadRequestException ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(ChatNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleChatNotFoundException(RuntimeException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
 

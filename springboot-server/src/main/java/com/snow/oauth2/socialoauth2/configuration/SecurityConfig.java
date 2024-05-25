@@ -53,48 +53,46 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()));
+        http.cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()).and());
         http.sessionManagement(sessionManagement -> sessionManagement
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.csrf(AbstractHttpConfigurer::disable);
-        http
-                .formLogin(AbstractHttpConfigurer::disable)
+        http.formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
-        http
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(new RestAuthenticationEntryPoint()));
-        http
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/",
-                                "/error",
-                                "/favicon.ico",
-                                "/*/*.png",
-                                "/*/*.gif",
-                                "/*/*.svg",
-                                "/*/*.jpg",
-                                "/*/*.html",
-                                "/*/*.css",
-                                "/*/*.js",
-                                "/api/v1/**",
-                                "/swagger-ui/**",
-                                "/swagger-resources/**",
-                                "/v2/api-docs",
-                                "/v3/api-docs",
-                                "/webjars/**",
-                                "/v3/api-docs/**",
-                                "/configuration/ui",
-                                "/configuration/security",
-                                "/swagger-resources",
-                                "/swagger-resources/**",
-                                "/swagger-ui.html"
+        http.exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint(new RestAuthenticationEntryPoint()));
+        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                .requestMatchers("/",
+                        "/error",
+                        "/favicon.ico",
+                        "/*/*.png",
+                        "/*/*.gif",
+                        "/*/*.svg",
+                        "/*/*.jpg",
+                        "/*/*.html",
+                        "/*/*.css",
+                        "/*/*.js",
+                        "/api/v1/**",
+                        "/swagger-ui/**",
+                        "/swagger-resources/**",
+                        "/v2/api-docs",
+                        "/v3/api-docs",
+                        "/webjars/**",
+                        "/v3/api-docs/**",
+                        "/configuration/ui",
+                        "/configuration/security",
+                        "/swagger-resources",
+                        "/swagger-resources/**",
+                        "/swagger-ui.html",
+                        "/ws/**"
 
-                        )
-                        .permitAll()
-                        .requestMatchers("/auth/**", "/oauth2/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated());
 
+                )
+                .permitAll()
+                .requestMatchers("/auth/**", "/oauth2/**","ws/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated());
 
 
         http.oauth2Login(oauth2 -> oauth2
