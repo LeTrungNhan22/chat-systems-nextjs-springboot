@@ -9,57 +9,11 @@ import TextareaAutosize from "react-textarea-autosize";
 
 type Props = {};
 
+
 const ChatInput = (props: Props) => {
   const form = useForm();
-  const { isLoading } = form.formState;
-  const [count, setCount] = React.useState(0);
 
-  //handler websocket
-  const [messages, setMessages] = useState<string[]>([]);
-  const [messageInput, setMessageInput] = useState<string>("");
-  const [ws, setWs] = useState<WebSocket | null>(null);
-
-  useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080/ws/websocket");
-    setWs(ws);
-
-    ws.onopen = () => {
-      console.log("Connected to WebSocket server");
-    };
-
-    ws.onmessage = (event) => {
-      const newMessage = event.data;
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-    };
-
-    ws.onclose = (event) => {
-      console.error("WebSocket connection closed:", event);
-    };
-
-    ws.onerror = (event) => {
-      console.error("WebSocket error:", event);
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, []);
-  // end
-
-  const sendMessage = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(messageInput);
-      setMessageInput("");
-    } else {
-      console.error("WebSocket connection is not open yet.");
-    }
-  };
-  const fetchStomp = (e: any) => {
-    e.preventDefault();
-    sendMessage();
-    setCount(count + 1);
-    console.log("clicked", count);
-  };
+ 
 
   return (
     <Card className="w-full p-2 rounded-lg relative">
@@ -85,7 +39,7 @@ const ChatInput = (props: Props) => {
                 );
               }}
             />
-            <Button onClick={fetchStomp} size="icon">
+            <Button size="icon">
               <SendHorizonal />
             </Button>
           </form>

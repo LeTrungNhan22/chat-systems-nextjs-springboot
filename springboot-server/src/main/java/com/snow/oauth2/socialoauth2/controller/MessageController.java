@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,70 +43,75 @@ public class MessageController {
     private final UserService userService;
     private final ChatService chatService;
 
-    @MessageMapping("/app/hello")
+    @MessageMapping("/hello")
     @SendTo("/topic/greetings")
-    public String greeting(String message) throws Exception {
-        Thread.sleep(1000); // Simulated delay
-        return "Hello, " + message + "!";
+    public String greeting(@Payload com.snow.oauth2.socialoauth2.model.Message message) throws Exception {
+        try {
+            Thread.sleep(1000); // Simulated delay
+            return "Hello client, " + message.getMessage() + "!";
+        } catch (Exception e) {
+            logger.error("Error processing message: ", e); // Log the error
+            throw e; // Re-throw the exception to trigger error handling (optional)
+        }
     }
 
 
-//    @MessageMapping("/{chatId}/sendMessage")
-//    @PreAuthorize("hasRole('USER')")
-//    public ResponseEntity<ChatDto.MessageDto> sendMessage(
-//            @PathVariable String chatId,
-//            @RequestBody ChatDto.MessageDto messageDto,
-//            @CurrentUser UserPrincipal userPrincipal
-//    ) {
-//        try {
-//            Message message = messageService.sendMessage(chatId, messageDto, userPrincipal.getId());
-//            ChatDto.MessageDto messageDtoResponse = MessageMapper.INSTANCE.messageToMessageDto(message);
-//            Chat chat = chatService.getChatById(chatId);
-//            String destination = chat.isGroupChat() ? "/topic/messages/" + chatId : "/queue/messages";
-//            messagingTemplate.convertAndSend(destination, messageDtoResponse);
-//            return ResponseEntity.ok(messageDtoResponse);
-//        } catch (ChatNotFoundException | UserNotFoundException ex) {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        } catch (Exception ex) {
-//            logger.error("Error sending message: ", ex);
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//
-//    }
-//
-//    @MessageMapping("/chat/{chatId}/forwardMessage")
-//    @Operation(summary = "Forward message")
-//    public void forwardMessage(@DestinationVariable String chatId, ChatDto.MessageDto messageDto) {
-//        Chat chat = chatService.getChatById(chatId); // Lấy thông tin chat
-//        String receiverId = chatService.getReceiverId(chat, messageDto.getSenderId()); // Lấy receiverId từ ChatService
-//        messagingTemplate.convertAndSendToUser(receiverId, "/queue/messages", messageDto);
-//    }
-//
-//
-//    @MessageMapping("/chat/{chatId}/messages/{messageId}/read")
-//    @PreAuthorize("hasRole('USER')")
-//    public void markMessageAsRead(
-//            @DestinationVariable String chatId,
-//            @DestinationVariable String messageId,
-//            @CurrentUser UserPrincipal userPrincipal
-//    ) {
-//        // Update message status to read
-//        UserDto user = userService.getUserById(userPrincipal.getId());
-//        // Call service to update message status
-//        messageService.markMessageAsRead(chatId, messageId, user.getId());
-//
-//        // notify sender that message has been read
-//        Chat chat = chatService.getChatById(chatId);
-//        String senderId = chatService.getReceiverId(chat, user.getId());
-//        NotificationDto notificationDto = new NotificationDto();
-//        notificationDto.setType(NotificationType.MESSAGE);
-//        notificationDto.setRead(true);
-//        notificationDto.setRecipient(senderId);
-//        notificationDto.setContent("Message has been read");
-//        notificationDto.setCreatedAt(messageService.getMessageById(messageId).getTimestamp());
-//        messagingTemplate.convertAndSendToUser(senderId, "/queue/notifications", notificationDto);
-//
-//
-//    }
+    @MessageMapping("/{chatId}/sendMessage")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ChatDto.MessageDto> sendMessage(
+            @PathVariable String chatId,
+            @RequestBody ChatDto.MessageDto messageDto,
+            @CurrentUser UserPrincipal userPrincipal
+    ) {
+        try {
+            Message message = messageService.sendMessage(chatId, messageDto, userPrincipal.getId());
+            ChatDto.MessageDto messageDtoResponse = MessageMapper.INSTANCE.messageToMessageDto(message);
+            Chat chat = chatService.getChatById(chatId);
+            String destination = chat.isGroupChat() ? "/topic/messages/" + chatId : "/queue/messages";
+            messagingTemplate.convertAndSend(destination, messageDtoResponse);
+            return ResponseEntity.ok(messageDtoResponse);
+        } catch (ChatNotFoundException | UserNotFoundException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception ex) {
+            logger.error("Error sending message: ", ex);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @MessageMapping("/chat/{chatId}/forwardMessage")
+    @Operation(summary = "Forward message")
+    public void forwardMessage(@DestinationVariable String chatId, ChatDto.MessageDto messageDto) {
+        Chat chat = chatService.getChatById(chatId); // Lấy thông tin chat
+        String receiverId = chatService.getReceiverId(chat, messageDto.getSenderId()); // Lấy receiverId từ ChatService
+        messagingTemplate.convertAndSendToUser(receiverId, "/queue/messages", messageDto);
+    }
+
+
+    @MessageMapping("/chat/{chatId}/messages/{messageId}/read")
+    @PreAuthorize("hasRole('USER')")
+    public void markMessageAsRead(
+            @DestinationVariable String chatId,
+            @DestinationVariable String messageId,
+            @CurrentUser UserPrincipal userPrincipal
+    ) {
+        // Update message status to read
+        UserDto user = userService.getUserById(userPrincipal.getId());
+        // Call service to update message status
+        messageService.markMessageAsRead(chatId, messageId, user.getId());
+
+        // notify sender that message has been read
+        Chat chat = chatService.getChatById(chatId);
+        String senderId = chatService.getReceiverId(chat, user.getId());
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.setType(NotificationType.MESSAGE);
+        notificationDto.setRead(true);
+        notificationDto.setRecipient(senderId);
+        notificationDto.setContent("Message has been read");
+        notificationDto.setCreatedAt(messageService.getMessageById(messageId).getTimestamp());
+        messagingTemplate.convertAndSendToUser(senderId, "/queue/notifications", notificationDto);
+
+
+    }
 
 }
