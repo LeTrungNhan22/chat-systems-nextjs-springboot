@@ -1,8 +1,7 @@
 package com.snow.oauth2.socialoauth2.controller;
 
-
+import com.snow.oauth2.socialoauth2.dto.mapper.ChatMapper;
 import com.snow.oauth2.socialoauth2.dto.request.chat.ChatDto;
-import com.snow.oauth2.socialoauth2.dto.request.chat.ChatMapper;
 import com.snow.oauth2.socialoauth2.model.chat.Chat;
 import com.snow.oauth2.socialoauth2.security.CurrentUser;
 import com.snow.oauth2.socialoauth2.security.UserPrincipal;
@@ -31,13 +30,12 @@ public class ChatController {
     }
 
     @GetMapping("/{chatId}/sendMessage")
-    public ResponseEntity<ChatDto.MessageDto> sendMessage2(
+    public String sendMessageTestModel(
             @PathVariable String chatId,
             @RequestBody ChatDto.MessageDto messageDto,
             @CurrentUser UserPrincipal userPrincipal
     ) {
-        return null;
+        return "This is a test message.";
     }
-
 
 }

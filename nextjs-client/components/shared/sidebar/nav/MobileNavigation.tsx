@@ -16,17 +16,13 @@ import { ThemeToggle } from "@/components/ui/theme/theme-toggle";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useConversation } from "@/hooks/useConversation";
 import { useNavigation } from "@/hooks/useNavigation";
-import { AuthUser } from "@/utils/types/auth";
+import { AuthUser } from "@/utils/types/users/auth";
 import { LogOut, User } from "lucide-react";
-
-import Image from "next/image";
 import Link from "next/link";
-import LoadingLogo from "../../LoadingLogo";
 
 type Props = {
   user: AuthUser | null;
@@ -35,12 +31,7 @@ type Props = {
   isLoading: boolean;
 };
 
-const MobileNavigation = ({
-  user,
-  isAuthenticated,
-  logOutUser,
-  isLoading,
-}: Props) => {
+const MobileNavigation = ({ user, logOutUser }: Props) => {
   const paths = useNavigation();
 
   const { isActive } = useConversation();

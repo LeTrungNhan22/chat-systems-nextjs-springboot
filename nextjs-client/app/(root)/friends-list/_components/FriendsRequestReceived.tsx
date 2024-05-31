@@ -1,15 +1,14 @@
-'use client'
+"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { TUser } from "@/utils/types/auth";
 
 import { Check, X } from "lucide-react";
 import React from "react";
 
 type Props = {};
 
-const RequestFriend = (props: Props) => {
+const FriendRequestReceived = (props: Props) => {
   return (
     <Card className="w-full p-2 flex flex-row items-center justify-between gap-2">
       <div className="flex items-center gap-4 truncate">
@@ -36,4 +35,4 @@ const RequestFriend = (props: Props) => {
   );
 };
 
-export default RequestFriend;
+export default FriendRequestReceived;

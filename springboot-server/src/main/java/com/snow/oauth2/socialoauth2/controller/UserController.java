@@ -11,6 +11,7 @@ import com.snow.oauth2.socialoauth2.security.UserPrincipal;
 import com.snow.oauth2.socialoauth2.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
 public class UserController {
-    private final UserRepository userRepository;
 
+    private final UserRepository userRepository;
     private final UserService userService;
 
     @GetMapping("/profile")
@@ -47,5 +48,13 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<User>> searchUsers(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
+        Page<User> users = userService.searchUsers(query, page, size);
+        return ResponseEntity.ok(users);
+    }
 }

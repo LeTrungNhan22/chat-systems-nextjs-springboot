@@ -16,9 +16,8 @@ public class Message {
     private String id;
     @DBRef
     private User sender;
-    @DBRef
-    private User receiver;
     private String messageContent;
+    private String mediaUrl;
     private LocalDateTime timestamp;
     private MessageStatus status;
     private MessageType messageType;

@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class User {
     @Id
+    @Indexed(unique = true)
     private String id;
     private String username;
     @Indexed(unique = true)

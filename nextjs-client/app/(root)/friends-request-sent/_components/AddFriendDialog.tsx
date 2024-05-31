@@ -22,30 +22,54 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { TUser } from "@/utils/types/users/auth";
 import { DialogTrigger } from "@radix-ui/react-dialog";
+import axios from "axios";
 import { UserPlus } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+
+import { useDebounce } from "use-debounce";
 
 type Props = {};
 
 const AddFriendDialog = (props: Props) => {
+  const [query, setQuery] = useState("");
+  const [users, setUsers] = useState<TUser[]>([]);
+
+  const debouncedQuery = useDebounce(query, 300);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (debouncedQuery.length > 2) {
+        // Chỉ tìm kiếm khi có ít nhất 3 ký tự
+        const res = await axios.get(
+          `/api/users/search?query=${debouncedQuery}`
+        );
+        setUsers(res.data);
+      } else {
+        setUsers([]);
+      }
+    };
+    fetchUsers();
+  }, [debouncedQuery]);
   const form = useForm();
 
   const onHandleSubmit = (data: any) => {
     console.log(data);
   };
+
   return (
     <Dialog>
       <Tooltip>
         <TooltipTrigger>
-          <Button asChild size={"icon"} variant={"outline"}>
+          <Button asChild size={"icon"} className="p-2" variant={"outline"}>
             <DialogTrigger asChild>
               <UserPlus />
             </DialogTrigger>
           </Button>
         </TooltipTrigger>
-        <TooltipContent>
+        <TooltipContent side="right">
           <p>Thêm bạn</p>
         </TooltipContent>
       </Tooltip>
@@ -64,12 +88,16 @@ const AddFriendDialog = (props: Props) => {
           >
             <FormField
               control={form.control}
-              name="email"
+              name={`email`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email:</FormLabel>
                   <FormControl>
-                    <Input placeholder="Email/UserId" {...field} />
+                    <Input
+                      placeholder="Email/UserId"
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -77,7 +105,7 @@ const AddFriendDialog = (props: Props) => {
             />
             <DialogFooter>
               <Button disabled={false} type="submit">
-                Gửi
+                Gửi yêu cầu
               </Button>
             </DialogFooter>
           </form>

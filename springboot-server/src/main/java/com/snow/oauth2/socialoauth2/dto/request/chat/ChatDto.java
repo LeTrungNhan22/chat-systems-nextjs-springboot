@@ -1,6 +1,5 @@
 package com.snow.oauth2.socialoauth2.dto.request.chat;
 
-import com.snow.oauth2.socialoauth2.model.chat.MessageStatus;
 import com.snow.oauth2.socialoauth2.model.chat.MessageType;
 import com.snow.oauth2.socialoauth2.model.user.ProviderType;
 import lombok.AllArgsConstructor;
@@ -36,9 +35,9 @@ public class ChatDto {
 
     @Data
     public static class MessageDto {
-        private String senderId;    // ID của người gửi// Tên của người gửi (tùy chọn)
-        private String receiverId;  // ID của người nhận (nếu là tin nhắn riêng tư)
+        private String senderId;
         private String messageContent;
+        private String mediaUrl; // media url if message type is media
         private MessageType type;
     }
 }

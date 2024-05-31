@@ -1,7 +1,8 @@
 package com.snow.oauth2.socialoauth2.service.message;
 
+import com.snow.oauth2.socialoauth2.dto.mapper.MessageMapper;
 import com.snow.oauth2.socialoauth2.dto.request.chat.ChatDto;
-import com.snow.oauth2.socialoauth2.exception.auth.BadRequestException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
 import com.snow.oauth2.socialoauth2.model.chat.Chat;
 import com.snow.oauth2.socialoauth2.model.chat.Message;
@@ -13,7 +14,9 @@ import com.snow.oauth2.socialoauth2.repository.UserRepository;
 import com.snow.oauth2.socialoauth2.service.chat.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,40 +29,49 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChatRepository chatRepository;
+    private final SimpMessagingTemplate messagingTemplate;
     private final ChatService chatService;
 
+    @Autowired
+    private  MessageMapper messageMapper;
 
     @Override
-    public Message sendMessage(String chatId, ChatDto.MessageDto messageDto, String senderId) {
-        User sender = userRepository.findById(senderId).orElseThrow(() -> new UserNotFoundException(senderId));
-        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new BadRequestException("Chat not found with id: " + chatId));
+    public ChatDto.MessageDto sendMessage(String chatId, ChatDto.MessageDto messageDto, String senderId) {
+        try {
+            // 1. Create object message
+            User sender = userRepository.findById(senderId).orElseThrow(() -> new UserNotFoundException(senderId));
+            Message message = messageMapper.messageDtoToMessage(messageDto);
+            message.setSender(sender); // set sender
+            message.setTimestamp(LocalDateTime.now()); // Thêm timestamp
+            message.setChat(chatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException(chatId)));
+            message.setStatus(MessageStatus.SENT); // Thêm status
+            // 2. Lưu tin nhắn vào database
+            message = messageRepository.save(message);
+            // 3. Lấy thông tin chat
+            Chat chat = chatService.getChatById(chatId);
+            // 4. Gửi tin nhắn qua WebSocket (hoặc cơ chế khác)
+            String destination = chat.isGroupChat() ? "/topic/messages/" + chatId : "/queue/messages";
+            ChatDto.MessageDto messageDtoResponse = messageMapper.messageToMessageDto(message);
+            messagingTemplate.convertAndSend(destination, messageDtoResponse);
 
-        Message message = new Message();
-        message.setReceiver(chatService.getReceiver(chatId, senderId));
-        message.setChat(chat);
-        message.setSender(sender);
-        message.setMessageContent(messageDto.getMessageContent());
-        message.setMessageType(messageDto.getType());
-        message.setStatus(MessageStatus.DELIVERED);
-        message.setTimestamp(LocalDateTime.now());
-
-        return messageRepository.save(message);
+            return messageDtoResponse;
+        } catch (ChatNotFoundException | UserNotFoundException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Error sending message", ex);
+            throw new RuntimeException("Error sending message", ex);
+        }
     }
 
     @Override
     public void markMessageAsRead(String chatId, String messageId, String id) {
-        Message message = messageRepository.findById(messageId).orElseThrow(() -> new BadRequestException("Message not found with id: " + messageId));
-        if (!message.getReceiver().getId().equals(id)) {
-            throw new BadRequestException("You are not receiver of this message");
-        }
-        message.setStatus(MessageStatus.SEEN);
-        messageRepository.save(message);
+
     }
 
     @Override
     public MessageHeaders getMessageById(String messageId) {
-        Message message = messageRepository.findById(messageId).
-                orElseThrow(() -> new BadRequestException("Message not found with id: " + messageId));
         return null;
     }
 }
+
+

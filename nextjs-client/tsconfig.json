@@ -28,6 +28,6 @@
     ".next/types/**/*.ts",
     "convex/auth.config.ts",
     "convex/auth.config.ts"
-  ],
+, "hooks/swr/useFriendRequests.jsx"  ],
   "exclude": ["node_modules"]
 }

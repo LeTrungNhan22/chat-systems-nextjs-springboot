@@ -9,11 +9,16 @@ import com.snow.oauth2.socialoauth2.repository.UserRepository;
 import com.snow.oauth2.socialoauth2.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    private  UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -70,6 +75,22 @@ public class UserServiceImpl implements UserService {
         );
         return convertToUserDto(user);
     }
+
+    @Override
+    public Page<User> searchUsers(String query, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.searchUsersByEmailOrId(query, pageable);
+    }
+
+
+
+    private void validateSearchParameters(String email, String id) {
+        if (email == null && id == null) {
+            throw new IllegalArgumentException("At least one search parameter must be provided");
+        }
+    }
+
+
 
     private UserDto convertToUserDto(User user) {
         UserDto userDto = new UserDto();

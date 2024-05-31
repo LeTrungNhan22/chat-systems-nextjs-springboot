@@ -8,6 +8,9 @@ import { CookiesProvider } from "next-client-cookies/server";
 import ProcessBarProvider from "@/provider/ProcessBarProvider";
 import { Toaster } from "@/components/ui/toaster";
 
+import { SWRConfig } from "swr";
+import { SWRProvider } from "@/provider/SwrProvider";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -32,7 +35,7 @@ export default function RootLayout({
             <CookiesProvider>
               <AuthProvider>
                 <ProcessBarProvider>
-                  {children}
+                  <SWRProvider>{children}</SWRProvider>
                   <Toaster />
                 </ProcessBarProvider>
               </AuthProvider>

@@ -1,8 +1,8 @@
 "use client";
 import React, { useContext } from "react";
-import DesktopNavigation from "./nav/DesktopNavigation";
-import MobileNavigation from "./nav/MobileNavigation";
 import { AuthContext } from "@/app/(authentication)/_context/context-auth";
+import MobileNavigation from "./nav/MobileNavigation";
+import DesktopNavigation from "./nav/DesktopNavigation";
 
 type Props = React.PropsWithChildren<{}>;
 

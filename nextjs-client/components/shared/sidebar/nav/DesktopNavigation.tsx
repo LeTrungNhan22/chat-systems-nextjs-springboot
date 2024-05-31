@@ -19,23 +19,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useNavigation } from "@/hooks/useNavigation";
-import { AuthUser } from "@/utils/types/auth";
+import { AuthUser } from "@/utils/types/users/auth";
 import { LogOut, User } from "lucide-react";
-
 import Link from "next/link";
-import LoadingLogo from "../../LoadingLogo";
+
 type Props = {
   user: AuthUser | null;
   isAuthenticated: boolean;
   logOutUser?: () => void;
   isLoading: boolean;
 };
-const DesktopNavigation = ({
-  user,
-  isAuthenticated,
-  logOutUser,
-  isLoading,
-}: Props) => {
+
+const DesktopNavigation = ({ user, logOutUser }: Props) => {
   const paths = useNavigation();
 
   return (
@@ -54,7 +49,7 @@ const DesktopNavigation = ({
                     >
                       <TooltipTrigger>{path.icon}</TooltipTrigger>
                     </Button>
-                    <TooltipContent>
+                    <TooltipContent side="right">
                       <p>{path.name}</p>
                     </TooltipContent>
                   </Tooltip>
@@ -74,7 +69,7 @@ const DesktopNavigation = ({
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
+          <DropdownMenuContent side="right" align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>

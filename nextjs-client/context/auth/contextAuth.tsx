@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode, createContext, useEffect, useMemo, useState } from "react";
 
-import { AuthUser } from "@/utils/types/auth";
+import { AuthUser } from "@/utils/types/users/auth";
 import { ACCESS_TOKEN, API_BASE_URL } from "@/constants";
 import { useRouter } from "next-nprogress-bar";
 import { useCookies } from "next-client-cookies";
@@ -36,18 +36,15 @@ export const AuthProvider = ({ children }: Props) => {
   const fetchUserProfile = async (token: string) => {
     try {
       setIsLoading(true); // Start loading
-
       const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (!response.ok) {
         throw new Error("Failed to fetch user profile");
       }
-
       const userProfile = await response.json();
       setUser({
         isAuthenticated: true,
@@ -62,7 +59,6 @@ export const AuthProvider = ({ children }: Props) => {
       setIsLoading(false); // Finish loading in all cases
     }
   };
-
   useEffect(() => {
     // Use useEffect to avoid calling twice on the client
     const token = cookies.get(ACCESS_TOKEN);

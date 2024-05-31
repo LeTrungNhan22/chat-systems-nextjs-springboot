@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode, createContext, useEffect, useState } from "react";
 
-import { AuthUser } from "@/utils/types/auth";
+import { AuthUser } from "@/utils/types/dto/user/auth";
 import { ACCESS_TOKEN, API_BASE_URL } from "@/constants";
 import { useRouter } from "next-nprogress-bar";
 import { useCookies } from "next-client-cookies";

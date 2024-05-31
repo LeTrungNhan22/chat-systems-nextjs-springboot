@@ -1,6 +1,7 @@
-package com.snow.oauth2.socialoauth2.dto.request.chat;
+package com.snow.oauth2.socialoauth2.dto.mapper;
 
 
+import com.snow.oauth2.socialoauth2.dto.request.chat.ChatDto;
 import com.snow.oauth2.socialoauth2.model.chat.Chat;
 import com.snow.oauth2.socialoauth2.model.chat.Message;
 import com.snow.oauth2.socialoauth2.model.user.User;
