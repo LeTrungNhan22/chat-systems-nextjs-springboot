@@ -13,16 +13,16 @@ export const useNavigation = () => {
         active: pathName.startsWith("/conversations"),
       },
       {
-        name: "Bạn bè",
+        name: "Danh sách bạn bè",
         path: "/friends-list",
         icon: <Users />,
         active: pathName.startsWith("/friends-list"),
       },
       {
-        name: "Đã gửi yêu cầu",
-        path: "/friends-request-sent",
+        name: "Thêm bạn bè",
+        path: "/friends-add",
         icon: <UserPlus />,
-        active: pathName.startsWith("/friends-request-sent"),
+        active: pathName.startsWith("/friends-add"),
       },
     ],
     [pathName]
