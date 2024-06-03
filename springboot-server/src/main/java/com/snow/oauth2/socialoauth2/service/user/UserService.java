@@ -19,5 +19,6 @@ public interface UserService extends UserDetailsService {
     List<UserDto> filterUsers(UserFilterRequestDto filterRequestDto);
 
     UserDto getUserById(String id);
-     Page<User> searchUsers(String query, int page, int size);
+
+    Page<User> searchUsers(String query, int page, int size);
 }

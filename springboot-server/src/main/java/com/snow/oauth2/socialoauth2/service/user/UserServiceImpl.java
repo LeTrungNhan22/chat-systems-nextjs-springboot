@@ -5,6 +5,7 @@ import com.snow.oauth2.socialoauth2.dto.request.user.UserDto;
 import com.snow.oauth2.socialoauth2.dto.request.user.UserFilterRequestDto;
 import com.snow.oauth2.socialoauth2.exception.notfoud.ResourceNotFoundException;
 import com.snow.oauth2.socialoauth2.model.user.User;
+import com.snow.oauth2.socialoauth2.repository.FriendRepository;
 import com.snow.oauth2.socialoauth2.repository.UserRepository;
 import com.snow.oauth2.socialoauth2.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +31,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    FriendRepository friendRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -79,9 +81,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> searchUsers(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return userRepository.searchUsersByEmailOrId(query, pageable);
+        Page<User> users = userRepository.searchUsersByEmailOrId(query, pageable);
+        return users;
     }
-
 
 
     private void validateSearchParameters(String email, String id) {
@@ -89,7 +91,6 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("At least one search parameter must be provided");
         }
     }
-
 
 
     private UserDto convertToUserDto(User user) {

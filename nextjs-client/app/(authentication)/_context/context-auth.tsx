@@ -1,10 +1,10 @@
 "use client";
 import { ReactNode, createContext, useEffect, useState } from "react";
-
-import { AuthUser } from "@/utils/types/dto/user/auth";
-import { ACCESS_TOKEN, API_BASE_URL } from "@/constants";
 import { useRouter } from "next-nprogress-bar";
 import { useCookies } from "next-client-cookies";
+
+import { AuthUser } from "@/utils/types/users/auth";
+import { ACCESS_TOKEN, API_BASE_URL } from "@/constants";
 
 interface TAuthContext {
   user: AuthUser | null;
@@ -66,7 +66,6 @@ export const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     const token = cookies.get(ACCESS_TOKEN);
     if (token && !user) {
-      // Only fetch if user data isn't already present
       fetchUserProfile(token);
     } else {
       setIsLoading(false);

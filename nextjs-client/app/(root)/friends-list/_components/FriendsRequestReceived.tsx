@@ -2,37 +2,41 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
 import { Check, X } from "lucide-react";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
+import axios from "axios";
+import { API_BASE_URL } from "@/constants";
+import useFriendRequests from "@/hooks/swr/useFriendRequests";
+import { AuthUser, TUser } from "@/utils/types/users/auth";
+import { AuthContext } from "@/app/(authentication)/_context/context-auth";
+import useSWR from "swr";
+import FriendRequestCard from "./FriendRequestCard";
 
-type Props = {};
+type Props = React.PropsWithChildren<{
+  user: AuthUser | null;
+}>;
+function FriendRequestReceived({ user }: Props) {
+  const { receivedRequests, isLoading, isError, mutateReceived } =
+    useFriendRequests(user?.user.id);
 
-const FriendRequestReceived = (props: Props) => {
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error fetching friend requests</div>;
+
   return (
-    <Card className="w-full p-2 flex flex-row items-center justify-between gap-2">
-      <div className="flex items-center gap-4 truncate">
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col truncate">
-          <h4 className="truncate">User Friend</h4>
-          <p className="text-xs text-muted-foreground truncate">
-            example@gmail.com
-          </p>
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <Button size="icon" onClick={() => {}}>
-          <Check />
-        </Button>
-        <Button size="icon" onClick={() => {}} variant={"destructive"}>
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-    </Card>
+    <>
+      {receivedRequests.length > 0 ? (
+        receivedRequests.map((request) => (
+          <FriendRequestCard
+            key={request.id}
+            request={request}
+            mutateReceived={mutateReceived}
+          />
+        ))
+      ) : (
+        <div>không có lời mời kết bạn mới</div>
+      )}
+    </>
   );
-};
+}
 
 export default FriendRequestReceived;

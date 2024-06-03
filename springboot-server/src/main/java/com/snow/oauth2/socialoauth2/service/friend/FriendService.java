@@ -10,9 +10,9 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 
 public interface FriendService {
-    FriendRequestDto sendFriendRequest(String currentUserId, FriendRequestDto friendRequestDto);
+    Friend sendFriendRequest(String currentUserId, String friendId);
 
-    List<FriendDto> getFriendRequests(String userId, boolean isSent);
+    List<Friend> getFriendRequests(String userId, boolean isSent);
 
     FriendStatusUpdateResponseDto updateFriendRequest(String userId, String friendRequestId, FriendStatus friendStatus);
 

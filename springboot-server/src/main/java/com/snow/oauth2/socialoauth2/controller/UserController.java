@@ -5,6 +5,7 @@ import com.snow.oauth2.socialoauth2.dto.request.user.UserDto;
 import com.snow.oauth2.socialoauth2.dto.request.user.UserFilterRequestDto;
 import com.snow.oauth2.socialoauth2.exception.notfoud.ResourceNotFoundException;
 import com.snow.oauth2.socialoauth2.model.user.User;
+import com.snow.oauth2.socialoauth2.model.user.UserDetails;
 import com.snow.oauth2.socialoauth2.repository.UserRepository;
 import com.snow.oauth2.socialoauth2.security.CurrentUser;
 import com.snow.oauth2.socialoauth2.security.UserPrincipal;

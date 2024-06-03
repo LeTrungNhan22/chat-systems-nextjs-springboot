@@ -8,6 +8,4 @@ import lombok.Data;
 public class FriendRequestDto {
     @NotNull
     private String friendId;
-
-
 }

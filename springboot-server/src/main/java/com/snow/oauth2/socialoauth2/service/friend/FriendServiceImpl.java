@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,31 +28,34 @@ public class FriendServiceImpl implements FriendService {
 
     private final UserRepository userRepository;
 
-    public FriendRequestDto sendFriendRequest(String currentUserId, FriendRequestDto friendRequestDto) {
+    public Friend sendFriendRequest(String currentUserId, String friendId) {
 
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserNotFoundException(currentUserId));
-        User requestedUser = userRepository.findById(friendRequestDto.getFriendId())
-                .orElseThrow(() -> new UserNotFoundException(friendRequestDto.getFriendId()));
+        User requestedUser = userRepository.findById(friendId)
+                .orElseThrow(() -> new UserNotFoundException(friendId));
 
         if (friendRepository.existsByCurrentUserIdAndRequestFriendId(currentUser.getId(), requestedUser.getId()) ||
             friendRepository.existsByCurrentUserIdAndRequestFriendId(requestedUser.getId(), currentUser.getId())) {
-            throw new FriendRequestAlreadyExistsException(currentUserId, friendRequestDto.getFriendId());
+            throw new FriendRequestAlreadyExistsException(currentUserId, friendId);
         }
+
 
         Friend friendRequest = Friend.builder()
                 .currentUserId(currentUser.getId())
                 .requestFriendId(requestedUser.getId())
                 .status(FriendStatus.PENDING)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(null)
                 .build();
         friendRepository.save(friendRequest);
 
-        // 4. Gửi thông báo cho người dùng được mời (tùy chọn, sử dụng WebSocket hoặc cơ chế khác)
-        return friendRequestDto;
+        // 4. Gửi thông báo cho người dùng được mời (tùy chọn, sử dụng WebSocket )
+        return friendRequest;
     }
 
     @Override
-    public List<FriendDto> getFriendRequests(String userId, boolean isSent) { // Thêm tham số isSent để xác định lấy danh sách gửi đi hay nhận về
+    public List<Friend> getFriendRequests(String userId, boolean isSent) { // Thêm tham số isSent để xác định lấy danh sách gửi đi hay nhận về
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
@@ -62,9 +66,7 @@ public class FriendServiceImpl implements FriendService {
             friendRequests = friendRepository.findByRequestFriendIdAndStatus(user.getId(), FriendStatus.PENDING);
         }
 
-        return friendRequests.stream()
-                .map(this::mapToFriendDto)
-                .collect(Collectors.toList());
+        return friendRequests;
     }
 
     @Override
@@ -87,7 +89,8 @@ public class FriendServiceImpl implements FriendService {
                 .currentUserId(friend.getCurrentUserId())
                 .requestFriendId(friend.getRequestFriendId())
                 .status(friend.getStatus())
-                .build();
+                .createdAt(friend.getCreatedAt())
+                .updatedAt(LocalDateTime.now()).build();
     }
 
     @Override

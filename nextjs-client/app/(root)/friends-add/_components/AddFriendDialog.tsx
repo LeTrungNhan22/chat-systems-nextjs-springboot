@@ -95,18 +95,17 @@ const AddFriendDialog = () => {
                   </FormItem>
                 )}
               />
-              <Button
-                size={"default"}
-                type="submit"
-                disabled={isMutating} // Chỉ disable khi đang tải
-              >
+              <Button size={"default"} type="submit" disabled={isMutating}>
                 {isMutating ? "Đang tìm kiếm..." : "Tìm kiếm"}
               </Button>
             </div>
           </form>
         </Form>
-        {searchResults?.map((user) => (
-          <UserSearchItem key={user.id} user={user} />
+        {searchResults?.map((userSearchItem) => (
+          <UserSearchItem
+            key={userSearchItem.id}
+            userSearchItem={userSearchItem}
+          />
         ))}
       </DialogContent>
     </Dialog>

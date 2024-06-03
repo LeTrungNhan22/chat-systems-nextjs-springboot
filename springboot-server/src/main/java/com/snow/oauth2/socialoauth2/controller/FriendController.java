@@ -29,22 +29,23 @@ public class FriendController {
 
     @GetMapping("/{userId}/requests/sent") // Lấy danh sách đã gửi
     @Operation(summary = "Get sent friend requests")
-    public ResponseEntity<List<FriendDto>> getSentFriendRequests(@PathVariable String userId) {
-        List<FriendDto> friendRequests = friendService.getFriendRequests(userId, true);
+    public ResponseEntity<List<Friend>> getSentFriendRequests(@PathVariable String userId) {
+        List<Friend> friendRequests = friendService.getFriendRequests(userId, true);
         return ResponseEntity.ok(friendRequests);
     }
 
     @GetMapping("/{userId}/requests/received") // Lấy danh sách đã nhận
     @Operation(summary = "Get received friend requests")
-    public ResponseEntity<List<FriendDto>> getReceivedFriendRequests(@PathVariable String userId) {
-        List<FriendDto> friendRequests = friendService.getFriendRequests(userId, false);
+    public ResponseEntity<List<Friend>> getReceivedFriendRequests(@PathVariable String userId) {
+
+        List<Friend> friendRequests = friendService.getFriendRequests(userId, false);
         return ResponseEntity.ok(friendRequests);
     }
 
-    @PostMapping("/{userId}/requests")
+    @PostMapping("/{userId}/requests/{friendId}")
     @Operation(summary = "Send friend request")
-    public ResponseEntity<FriendRequestDto> sendFriendRequest(@PathVariable String userId, @RequestBody FriendRequestDto friendRequestDto) {
-        FriendRequestDto createdFriendRequest = friendService.sendFriendRequest(userId, friendRequestDto);
+    public ResponseEntity<Friend> sendFriendRequest(@PathVariable String userId, @PathVariable String  friendId) {
+        Friend createdFriendRequest = friendService.sendFriendRequest(userId, friendId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFriendRequest);
     }
 
