@@ -1,4 +1,4 @@
-# [Project Name] - Real-Time Chat System
+# [Real-Time Chat System]
 
 [Project Name] is a real-time chat application built with [Primary Technologies] (e.g., React, Java ( Spring boot), Spring WebSocket). This project enables users to communicate instantly through text messages in individual or group conversations.
 
