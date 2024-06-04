@@ -4,8 +4,8 @@ import { API_BASE_URL } from "@/constants";
 
 interface FriendRequestsResponse {
   id: string;
-  currentUserId: string;
-  requestFriendId: string;
+  userId1: string;
+  userId2: string;
   status: string;
   createdAt: string;
   updatedAt: string;

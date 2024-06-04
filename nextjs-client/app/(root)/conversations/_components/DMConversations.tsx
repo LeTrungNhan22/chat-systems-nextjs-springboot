@@ -2,13 +2,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { Stomp } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
-import { useHelloMessage } from "@/hooks/websocket/useGetMessage";
-import { Button } from "@/components/ui/button";
-let stompClient: any;
-
+import React from "react";
 type Props = {};
 
 const DMConversations = (props: Props) => {

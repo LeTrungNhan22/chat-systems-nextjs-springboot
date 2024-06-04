@@ -1,22 +1,19 @@
 package com.snow.oauth2.socialoauth2.service.friend;
 
-import com.snow.oauth2.socialoauth2.dto.request.friend.FriendDto;
-import com.snow.oauth2.socialoauth2.dto.request.friend.FriendRequestDto;
 import com.snow.oauth2.socialoauth2.dto.response.FriendStatusUpdateResponseDto;
-import com.snow.oauth2.socialoauth2.model.friend.Friend;
-import com.snow.oauth2.socialoauth2.model.friend.FriendStatus;
-import org.springframework.data.mongodb.repository.Query;
+import com.snow.oauth2.socialoauth2.model.friend.FriendShip;
+import com.snow.oauth2.socialoauth2.model.friend.FriendshipStatus;
 
 import java.util.List;
 
 public interface FriendService {
-    Friend sendFriendRequest(String currentUserId, String friendId);
+    FriendShip sendFriendRequest(String userId1, String userId2);
 
-    List<Friend> getFriendRequests(String userId, boolean isSent);
+    List<FriendShip> getFriendRequests(String userId, boolean isSent);
 
-    FriendStatusUpdateResponseDto updateFriendRequest(String userId, String friendRequestId, FriendStatus friendStatus);
+    FriendStatusUpdateResponseDto updateFriendRequest(String currentUserId, String friendRequestId, FriendshipStatus friendStatus);
 
-    List<Friend> getListOfFriends(String userId);
+    List<FriendShip> getListOfFriends(String userId);
 }
 
 

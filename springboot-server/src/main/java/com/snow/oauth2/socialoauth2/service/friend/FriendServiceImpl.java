@@ -1,12 +1,12 @@
 package com.snow.oauth2.socialoauth2.service.friend;
 
-import com.snow.oauth2.socialoauth2.dto.request.friend.FriendDto;
-import com.snow.oauth2.socialoauth2.dto.request.friend.FriendRequestDto;
 import com.snow.oauth2.socialoauth2.dto.response.FriendStatusUpdateResponseDto;
+import com.snow.oauth2.socialoauth2.exception.auth.BadRequestException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.FriendRequestAlreadyExistsException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.InvalidUserException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
-import com.snow.oauth2.socialoauth2.model.friend.Friend;
-import com.snow.oauth2.socialoauth2.model.friend.FriendStatus;
+import com.snow.oauth2.socialoauth2.model.friend.FriendShip;
+import com.snow.oauth2.socialoauth2.model.friend.FriendshipStatus;
 import com.snow.oauth2.socialoauth2.model.user.User;
 import com.snow.oauth2.socialoauth2.repository.FriendRepository;
 import com.snow.oauth2.socialoauth2.repository.UserRepository;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -28,83 +27,111 @@ public class FriendServiceImpl implements FriendService {
 
     private final UserRepository userRepository;
 
-    public Friend sendFriendRequest(String currentUserId, String friendId) {
+    public FriendShip sendFriendRequest(String userId1, String userId2) {
 
-        User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new UserNotFoundException(currentUserId));
-        User requestedUser = userRepository.findById(friendId)
-                .orElseThrow(() -> new UserNotFoundException(friendId));
+        User user1 = userRepository.findById(userId1)
+                .orElseThrow(() -> new UserNotFoundException(userId1));
+        User user2 = userRepository.findById(userId2)
+                .orElseThrow(() -> new UserNotFoundException(userId2));
 
-        if (friendRepository.existsByCurrentUserIdAndRequestFriendId(currentUser.getId(), requestedUser.getId()) ||
-            friendRepository.existsByCurrentUserIdAndRequestFriendId(requestedUser.getId(), currentUser.getId())) {
-            throw new FriendRequestAlreadyExistsException(currentUserId, friendId);
-        }
+        validateRequestFriendShip(userId1, userId2);
 
 
-        Friend friendRequest = Friend.builder()
-                .currentUserId(currentUser.getId())
-                .requestFriendId(requestedUser.getId())
-                .status(FriendStatus.PENDING)
+        FriendShip friendShipRequest = FriendShip.builder()
+                .userId1(user1.getId())
+                .userId2(user2.getId())
+                .status(FriendshipStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(null)
                 .build();
-        friendRepository.save(friendRequest);
+        friendRepository.save(friendShipRequest);
 
         // 4. Gửi thông báo cho người dùng được mời (tùy chọn, sử dụng WebSocket )
-        return friendRequest;
+        return friendShipRequest;
     }
 
+
     @Override
-    public List<Friend> getFriendRequests(String userId, boolean isSent) { // Thêm tham số isSent để xác định lấy danh sách gửi đi hay nhận về
+    public List<FriendShip> getFriendRequests(String userId, boolean isSent) { // Thêm tham số isSent để xác định lấy danh sách gửi đi hay nhận về
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        List<Friend> friendRequests;
+        List<FriendShip> friendShipRequests;
         if (isSent) {
-            friendRequests = friendRepository.findByCurrentUserIdAndStatus(user.getId(), FriendStatus.PENDING);
+            friendShipRequests = friendRepository.findByUserId1AndStatus(user.getId(), FriendshipStatus.PENDING);
         } else {
-            friendRequests = friendRepository.findByRequestFriendIdAndStatus(user.getId(), FriendStatus.PENDING);
+            friendShipRequests = friendRepository.findByUserId2AndStatus(user.getId(), FriendshipStatus.PENDING);
         }
 
-        return friendRequests;
+        return friendShipRequests;
     }
 
     @Override
-    public FriendStatusUpdateResponseDto updateFriendRequest(String currentUserId, String friendRequestId, FriendStatus friendStatus) {
-        User user = userRepository.findById(friendRequestId)
-                .orElseThrow(() -> new UserNotFoundException(friendRequestId));
-        Friend friend = friendRepository.findByRequestFriendId(currentUserId);
-        if (friend == null) {
-            throw new UserNotFoundException(currentUserId);
+    public FriendStatusUpdateResponseDto updateFriendRequest(String userId2, String userId1, FriendshipStatus friendStatus) {
+        User user = userRepository.findById(userId2)
+                .orElseThrow(() -> new UserNotFoundException(userId2));
+
+        FriendShip friendShip = friendRepository.findByUserId1AndUserId2(userId1, userId2);
+
+        if (friendShip == null) {
+            throw new UserNotFoundException(userId1);
         }
 
-        if (!friend.getCurrentUserId().equals(user.getId())) {
-            throw new UserNotFoundException(currentUserId);
+        if (!friendShip.getUserId2().equals(user.getId())) {
+            throw new InvalidUserException("You are not authorized to update this friend request.");
         }
 
-        friend.setStatus(friendStatus);
-        friendRepository.save(friend);
+        friendShip.setStatus(friendStatus);
+        friendShip.setUpdatedAt(LocalDateTime.now());
+        friendRepository.save(friendShip);
 
         return FriendStatusUpdateResponseDto.builder()
-                .currentUserId(friend.getCurrentUserId())
-                .requestFriendId(friend.getRequestFriendId())
-                .status(friend.getStatus())
-                .createdAt(friend.getCreatedAt())
-                .updatedAt(LocalDateTime.now()).build();
+                .userId1(friendShip.getUserId1())
+                .userId2(friendShip.getUserId2())
+                .status(friendShip.getStatus())
+                .createdAt(friendShip.getCreatedAt())
+                .updatedAt(friendShip.getUpdatedAt())
+                .build();
     }
 
+
     @Override
-    public List<Friend> getListOfFriends(String userId) {
+    public List<FriendShip> getListOfFriends(String userId) {
         return friendRepository.getListOfFriends(userId);
     }
 
-    // Hàm ánh xạ từ Friend sang FriendDto
-    private FriendDto mapToFriendDto(Friend friend) {
-        return FriendDto.builder()
-                .senderId(friend.getCurrentUserId())
-                .receiverId(friend.getRequestFriendId())
-                .status(String.valueOf(friend.getStatus()))
-                .build();
+
+    //validate
+    private void validateRequestFriendShip(String userId1, String userId2) {
+
+        // 1 kiểm tra có trùng nhau không
+        if (userId1.equals(userId2)) {
+            throw new BadRequestException("User id1 and user id2 must be different");
+        }
+        FriendShip friendShip = friendRepository.findByUserId1AndUserId2(userId1, userId2);
+        if (friendShip != null) {
+            throw new FriendRequestAlreadyExistsException(userId1, userId2);
+        }
+
+        friendShip = friendRepository.findByUserId1AndUserId2(userId2, userId1);
+        if (friendShip != null) {
+            throw new FriendRequestAlreadyExistsException(userId2, userId1);
+        }
+
+        // 3. Kiểm tra xem người dùng đã là bạn với nhau chưa
+        List<FriendShip> friendShips = friendRepository.getListOfFriends(userId1);
+        for (FriendShip friend : friendShips) {
+            if (friend.getUserId2().equals(userId2)) {
+                throw new FriendRequestAlreadyExistsException(userId1, userId2);
+            }
+        }
+
+        friendShips = friendRepository.getListOfFriends(userId2);
+        for (FriendShip friend : friendShips) {
+            if (friend.getUserId2().equals(userId1)) {
+                throw new FriendRequestAlreadyExistsException(userId2, userId1);
+            }
+        }
     }
 }
 

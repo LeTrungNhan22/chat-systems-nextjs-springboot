@@ -1,19 +1,19 @@
+"use client";
 import ItemList from "@/components/item-list/ItemList";
 import ConversationFallback from "@/components/shared/conversation/ConversationFallback";
-import React from "react";
+import React, { useContext } from "react";
 import AddFriendDialog from "./_components/AddFriendDialog";
 import FriendRequestSent from "./_components/FriendsRequestSent";
 import { Separator } from "@/components/ui/separator";
+import { AuthContext } from "@/app/(authentication)/_context/context-auth";
 
-
-type Props = {};
-
-const FriendRequestSend = (props: Props) => {
+const FriendRequestSend = () => {
+  const { user } = useContext(AuthContext);
   return (
     <>
       <ItemList action={<AddFriendDialog />} title="Yêu cầu đã gửi">
         <Separator className="my-2" />
-        <FriendRequestSent />
+        <FriendRequestSent user={user} />
       </ItemList>
       <ConversationFallback />
     </>

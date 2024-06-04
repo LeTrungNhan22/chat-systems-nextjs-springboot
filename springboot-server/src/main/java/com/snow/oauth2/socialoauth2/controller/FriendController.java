@@ -1,23 +1,17 @@
 package com.snow.oauth2.socialoauth2.controller;
 
 
-import com.snow.oauth2.socialoauth2.dto.request.friend.FriendDto;
-import com.snow.oauth2.socialoauth2.dto.request.friend.FriendRequestDto;
 import com.snow.oauth2.socialoauth2.dto.response.FriendStatusUpdateResponseDto;
-import com.snow.oauth2.socialoauth2.model.friend.Friend;
-import com.snow.oauth2.socialoauth2.model.friend.FriendStatus;
+import com.snow.oauth2.socialoauth2.model.friend.FriendShip;
+import com.snow.oauth2.socialoauth2.model.friend.FriendshipStatus;
 import com.snow.oauth2.socialoauth2.service.friend.FriendService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/friends")
@@ -29,29 +23,29 @@ public class FriendController {
 
     @GetMapping("/{userId}/requests/sent") // Lấy danh sách đã gửi
     @Operation(summary = "Get sent friend requests")
-    public ResponseEntity<List<Friend>> getSentFriendRequests(@PathVariable String userId) {
-        List<Friend> friendRequests = friendService.getFriendRequests(userId, true);
-        return ResponseEntity.ok(friendRequests);
+    public ResponseEntity<List<FriendShip>> getSentFriendRequests(@PathVariable String userId) {
+        List<FriendShip> friendShipRequests = friendService.getFriendRequests(userId, true);
+        return ResponseEntity.ok(friendShipRequests);
     }
 
     @GetMapping("/{userId}/requests/received") // Lấy danh sách đã nhận
     @Operation(summary = "Get received friend requests")
-    public ResponseEntity<List<Friend>> getReceivedFriendRequests(@PathVariable String userId) {
+    public ResponseEntity<List<FriendShip>> getReceivedFriendRequests(@PathVariable String userId) {
 
-        List<Friend> friendRequests = friendService.getFriendRequests(userId, false);
-        return ResponseEntity.ok(friendRequests);
+        List<FriendShip> friendShipRequests = friendService.getFriendRequests(userId, false);
+        return ResponseEntity.ok(friendShipRequests);
     }
 
     @PostMapping("/{userId}/requests/{friendId}")
     @Operation(summary = "Send friend request")
-    public ResponseEntity<Friend> sendFriendRequest(@PathVariable String userId, @PathVariable String  friendId) {
-        Friend createdFriendRequest = friendService.sendFriendRequest(userId, friendId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdFriendRequest);
+    public ResponseEntity<FriendShip> sendFriendRequest(@PathVariable String userId, @PathVariable String  friendId) {
+        FriendShip createdFriendShipRequest = friendService.sendFriendRequest(userId, friendId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdFriendShipRequest);
     }
 
     @PutMapping("/{currentUserId}/requests/{friendRequestId}")
     @Operation(summary = "Update friend request")
-    public ResponseEntity<FriendStatusUpdateResponseDto> updateFriendRequest(@PathVariable String currentUserId, @PathVariable String friendRequestId, @RequestParam("friend-status") FriendStatus friendStatus) {
+    public ResponseEntity<FriendStatusUpdateResponseDto> updateFriendRequest(@PathVariable String currentUserId, @PathVariable String friendRequestId, @RequestParam("friend-status") FriendshipStatus friendStatus) {
         FriendStatusUpdateResponseDto updatedFriendRequest = friendService.updateFriendRequest(currentUserId, friendRequestId, friendStatus);
         return ResponseEntity.ok(updatedFriendRequest);
     }
@@ -59,9 +53,9 @@ public class FriendController {
 
     @GetMapping("/{userId}/friends")
     @Operation(summary = "Get list of friends")
-    public ResponseEntity<List<Friend>> getListOfFriends(@PathVariable String userId) {
-        List<Friend> friends = friendService.getListOfFriends(userId);
-        return ResponseEntity.ok(friends);
+    public ResponseEntity<List<FriendShip>> getListOfFriends(@PathVariable String userId) {
+        List<FriendShip> friendShips = friendService.getListOfFriends(userId);
+        return ResponseEntity.ok(friendShips);
     }
 
 

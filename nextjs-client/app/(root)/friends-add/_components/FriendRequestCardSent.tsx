@@ -7,6 +7,8 @@ import React from "react";
 import axios from "axios";
 import { API_BASE_URL } from "@/constants";
 import useSWR from "swr";
+import { Badge } from "@/components/ui/badge";
+import useUserProfileById from "@/hooks/swr/useUserProfileById";
 
 const fetchUserProfile = async (url: string) => {
   try {
@@ -19,28 +21,14 @@ const fetchUserProfile = async (url: string) => {
 };
 
 // Custom component for each FriendRequestCard
-function FriendRequestCard({
+function FriendRequestCardSent({
   request,
-  mutateReceived,
+  mutateSent,
 }: {
   request: any;
-  mutateReceived: any;
+  mutateSent: any;
 }) {
-  const { data: senderProfile, isLoading } = useSWR(
-    request.currentUserId
-      ? `${API_BASE_URL}/api/v1/users/${request.currentUserId}`
-      : null,
-    fetchUserProfile,
-    { revalidateOnFocus: false }
-  );
-
-  const handleAcceptRequest = async (friendId: string) => {
-    // ... (your handleAcceptRequest logic remains the same)
-  };
-
-  const handleRejectRequest = async (friendId: string) => {
-    // ... (your handleRejectRequest logic remains the same)
-  };
+  const { data: userProfile, isLoading } = useUserProfileById(request.userId2);
 
   return (
     <Card
@@ -49,16 +37,16 @@ function FriendRequestCard({
     >
       {isLoading ? (
         <div>Loading profile...</div>
-      ) : senderProfile ? (
+      ) : userProfile ? (
         <div className="flex items-center gap-2 truncate">
           <Avatar>
-            <AvatarImage src={senderProfile.imageUrl} />
+            <AvatarImage src={userProfile.imageUrl} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="flex flex-col truncate">
-            <h4 className="truncate">{senderProfile.username}</h4>
+            <h4 className="truncate">{userProfile.username}</h4>
             <p className="text-xs text-muted-foreground truncate">
-              {senderProfile.email}
+              {userProfile.email}
             </p>
           </div>
         </div>
@@ -66,27 +54,17 @@ function FriendRequestCard({
         <div>Error loading profile</div>
       )}
 
-      <div className="flex items-center gap-2">
-        <Button
-          size="icon"
-          onClick={() => handleAcceptRequest(request.currentUserId)}
-          disabled={isLoading}
-        >
-          <Check />
-        </Button>
-        <Button
-          size="icon"
-          onClick={() => handleRejectRequest(request.currentUserId)}
-          variant="destructive"
-          disabled={isLoading}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
+      {!isLoading && request.status == "PENDING" ? (
+        <div className="flex items-center gap-2">
+          <Button disabled variant={"secondary"}>
+            Pending
+          </Button>
+        </div>
+      ) : null}
     </Card>
   );
 }
 
-export default FriendRequestCard;
+export default FriendRequestCardSent;
 
 // Fetch user profile data

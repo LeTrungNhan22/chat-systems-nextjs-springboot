@@ -1,22 +1,18 @@
-import { AuthContext } from "@/app/(authentication)/_context/context-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import useAddFriend from "@/hooks/swr/useAddFriend";
-import useFriendRequests from "@/hooks/swr/useFriendRequests";
 import { TUser } from "@/utils/types/users/auth";
-import React, { useContext } from "react";
-
 type Props = {
   userSearchItem: TUser;
 };
 
 const UserSearchItem = ({ userSearchItem }: Props) => {
   const { data, error, isLoading, addFriend } = useAddFriend();
-  const { user } = useContext(AuthContext);
+  
   const onHandleAddFriend = (friendId: string) => async () => {
     try {
-      await addFriend(user?.user.id, friendId);
+      const result = await addFriend(friendId);
     } catch (error) {
       console.log("Error adding friend: ", error);
     }

@@ -1,38 +1,36 @@
 "use client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
-import { Check, X } from "lucide-react";
 import React from "react";
+import useFriendRequests from "@/hooks/swr/useFriendRequests";
+import { AuthUser } from "@/utils/types/users/auth";
+import FriendRequestCardSent from "./FriendRequestCardSent";
 
-type Props = {};
+type Props = React.PropsWithChildren<{
+  user: AuthUser | null;
+}>;
 
-const FriendRequestSent = (props: Props) => {
-  return (
-    <Card className="w-full p-2 flex flex-row items-center justify-between gap-2">
-      <div className="flex items-center gap-4 truncate">
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col truncate">
-          <h4 className="truncate">User Friend</h4>
-          <p className="text-xs text-muted-foreground truncate">
-            example@gmail.com
-          </p>
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <Button size="icon" onClick={() => {}}>
-          <Check />
-        </Button>
-        <Button size="icon" onClick={() => {}} variant={"destructive"}>
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-    </Card>
+function FriendsRequestSent({ user }: Props) {
+  const { sentRequests, isLoading, isError, mutateSent } = useFriendRequests(
+    user?.user.id
   );
-};
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error fetching friend requests</div>;
 
-export default FriendRequestSent;
+  return (
+    <>
+      {sentRequests.length > 0 ? (
+        sentRequests.map((request) => (
+          <FriendRequestCardSent
+            key={request.id}
+            request={request}
+            mutateSent={mutateSent}
+          />
+        ))
+      ) : (
+        <div>Không có lời mời kết bạn mới</div>
+      )}
+    </>
+  );
+}
+
+export default FriendsRequestSent;

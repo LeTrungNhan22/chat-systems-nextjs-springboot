@@ -23,13 +23,14 @@ import {
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { UserPlus } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import useUserSearch from "@/hooks/swr/useUserSearchMutation";
 import UserSearchItem from "./UserSearchItem";
 import useUserSearchMutation from "@/hooks/swr/useUserSearchMutation";
 import { TUser } from "@/utils/types/users/auth";
+import { AuthContext } from "@/app/(authentication)/_context/context-auth";
 
 const AddFriendDialog = () => {
   const form = useForm({
@@ -39,6 +40,7 @@ const AddFriendDialog = () => {
   });
   const [searchResults, setSearchResults] = useState<TUser[] | null>(null);
   const { searchUsers, isMutating, error } = useUserSearchMutation();
+  const { user } = useContext(AuthContext);
 
   const onHandleSubmit = async (data: any) => {
     try {
@@ -91,6 +93,10 @@ const AddFriendDialog = () => {
                         <span>Không tìm thấy kết quả</span>
                       )}
                       {error && <span>{error.message}</span>}
+                      {/* check user exist in searchResult*/}
+                      {searchResults?.find(
+                        (searchUser) => searchUser.id === user?.user.id
+                      ) && <span>Không thể kết bạn với bản thân </span>}
                     </FormMessage>
                   </FormItem>
                 )}
@@ -101,12 +107,15 @@ const AddFriendDialog = () => {
             </div>
           </form>
         </Form>
-        {searchResults?.map((userSearchItem) => (
-          <UserSearchItem
-            key={userSearchItem.id}
-            userSearchItem={userSearchItem}
-          />
-        ))}
+        {searchResults && (
+          <div className="space-y-4">
+            {searchResults
+              .filter((searchUser) => searchUser.id !== user?.user.id)
+              .map((user) => (
+                <UserSearchItem key={user.id} userSearchItem={user} />
+              ))}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

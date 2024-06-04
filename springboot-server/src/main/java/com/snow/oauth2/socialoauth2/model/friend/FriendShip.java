@@ -15,14 +15,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document(collection = "friends")
+@Document(collection = "friendships")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Friend {
+public class FriendShip {
     @Id
     private String id;
-    private String currentUserId;
-    private String requestFriendId;
-    private FriendStatus status;
+    private String userId1; // userId1 is the one who sends the request
+    private String userId2; // userId2 is the one who receives the request
+    private FriendshipStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
