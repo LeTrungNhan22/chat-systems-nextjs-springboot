@@ -70,10 +70,7 @@ const DesktopNavigation = ({ user, logOutUser }: Props) => {
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="right" align="end" className="w-56">
-            <DropdownMenuLabel>
-              {" "}
-              <span>{user?.user.imageUrl}</span>
-            </DropdownMenuLabel>
+            <DropdownMenuLabel>Menu</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>

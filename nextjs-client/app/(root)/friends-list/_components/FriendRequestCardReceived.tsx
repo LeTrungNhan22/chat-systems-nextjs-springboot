@@ -45,17 +45,18 @@ function FriendRequestCardReceived({
   };
 
   return (
-    <Card key={request.id} className="w-[350px]">
+    <Card
+      key={request.id}
+      className="w-full p-2 flex flex-row items-center justify-between gap-2"
+    >
       {isLoading ? (
         <div>Loading profile...</div>
       ) : userProfile ? (
-        <div className="grid w-full items-center gap-4">
-          <div className="flex-1 space-y-1">
-            <Avatar>
-              <AvatarImage src={userProfile.imageUrl} />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </div>
+        <div className="flex items-center gap-2 truncate">
+          <Avatar>
+            <AvatarImage src={userProfile.imageUrl} />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
           <div className="flex flex-col truncate">
             <h4 className="truncate">{userProfile.username}</h4>
             <p className="text-xs text-muted-foreground truncate">

@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.exception.global;
+package com.snow.oauth2.socialoauth2.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,4 +8,5 @@ import lombok.Data;
 public class ErrorResponse {
     private int status;
     private String message;
+
 }

@@ -23,6 +23,7 @@ public class FriendShip {
     private String userId1; // userId1 is the one who sends the request
     private String userId2; // userId2 is the one who receives the request
     private FriendshipStatus status;
+    private LocalDateTime rejectedAt; // Thêm trường rejectedAt
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

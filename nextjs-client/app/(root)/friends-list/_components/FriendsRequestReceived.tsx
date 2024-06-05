@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 
 import useFriendRequests from "@/hooks/swr/useFriendRequests";
 import { AuthUser } from "@/utils/types/users/auth";
 import FriendRequestCardReceived from "./FriendRequestCardReceived";
-import FriendRequestFallback from "@/components/shared/friend/FriendRequestFallback";
 
 type Props = React.PropsWithChildren<{
   user: AuthUser | null;
@@ -29,7 +28,11 @@ function FriendRequestReceived({ user }: Props) {
           />
         ))
       ) : (
-        <FriendRequestFallback />
+        <>
+          <div className="text-center text-gray-500">
+            Chưa có lời mời kết bạn nào
+          </div>
+        </>
       )}
     </>
   );

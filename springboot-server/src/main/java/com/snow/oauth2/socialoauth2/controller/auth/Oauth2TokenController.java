@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/oauth2")
 @RequiredArgsConstructor
 public class Oauth2TokenController {
-
-
     private final AppConfiguration appConfiguration;
-
 
     @PostMapping("/url")
     public String getOauth2Url(@RequestParam("provider") ProviderType providerType) {

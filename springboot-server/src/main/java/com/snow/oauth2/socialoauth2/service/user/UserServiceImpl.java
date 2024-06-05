@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,11 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-
 public class UserServiceImpl implements UserService {
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
 
     @Autowired
     private UserRepository userRepository;
@@ -37,20 +32,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository
+                .findByEmail(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with email : " + email)
                 );
-
         return UserPrincipal.create(user);
     }
 
     @Override
     public UserDetails loadUserById(String id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", id)
-        );
-
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
         return UserPrincipal.create(user);
     }
 
@@ -81,15 +75,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> searchUsers(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> users = userRepository.searchUsersByEmailOrId(query, pageable);
-        return users;
-    }
-
-
-    private void validateSearchParameters(String email, String id) {
-        if (email == null && id == null) {
-            throw new IllegalArgumentException("At least one search parameter must be provided");
-        }
+        return userRepository.searchUsersByEmailOrId(query, pageable);
     }
 
 

@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.exception.notfoud;
+package com.snow.oauth2.socialoauth2.exception.friendship;
 
 public class FriendRequestAlreadyExistsException extends RuntimeException {
 

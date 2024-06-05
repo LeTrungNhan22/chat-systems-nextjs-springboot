@@ -1,7 +1,12 @@
-package com.snow.oauth2.socialoauth2.exception.global;
+package com.snow.oauth2.socialoauth2.exception;
 
-import com.snow.oauth2.socialoauth2.exception.notfoud.*;
 import com.snow.oauth2.socialoauth2.exception.auth.BadRequestException;
+import com.snow.oauth2.socialoauth2.exception.friendship.FriendRequestAlreadyExistsException;
+import com.snow.oauth2.socialoauth2.exception.friendship.FriendRequestRejectedException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.InvalidUserException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.ResourceNotFoundException;
+import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -60,6 +65,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(ChatNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleChatNotFoundException(RuntimeException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
@@ -68,6 +74,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidUserException.class)
     public ResponseEntity<ErrorResponse> handleInvalidUserException(InvalidUserException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FriendRequestRejectedException.class)
+    public ResponseEntity<ErrorResponse> handleFriendRequestRejectedException(FriendRequestRejectedException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

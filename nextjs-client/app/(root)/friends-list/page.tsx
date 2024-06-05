@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import FriendRequestReceived from "./_components/FriendsRequestReceived";
 import { AuthContext } from "@/app/(authentication)/_context/context-auth";
 import RequestFriendContainer from "@/components/shared/friend/FriendRequestContainer";
+import FriendRequestFallback from "@/components/shared/friend/FriendRequestFallback";
 
 const FriendPage = () => {
   const { user } = useContext(AuthContext);
@@ -15,10 +16,9 @@ const FriendPage = () => {
     <>
       <ItemList title="Danh sách bạn bè">
         <Separator className="my-2" />
-      </ItemList>
-      <RequestFriendContainer>
         <FriendRequestReceived user={user} />
-      </RequestFriendContainer>
+      </ItemList>
+      <FriendRequestFallback />
     </>
   );
 };

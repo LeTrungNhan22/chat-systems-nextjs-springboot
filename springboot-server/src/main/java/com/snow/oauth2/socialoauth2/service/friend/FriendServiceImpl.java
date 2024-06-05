@@ -2,7 +2,7 @@ package com.snow.oauth2.socialoauth2.service.friend;
 
 import com.snow.oauth2.socialoauth2.dto.response.FriendStatusUpdateResponseDto;
 import com.snow.oauth2.socialoauth2.exception.auth.BadRequestException;
-import com.snow.oauth2.socialoauth2.exception.notfoud.FriendRequestAlreadyExistsException;
+import com.snow.oauth2.socialoauth2.exception.friendship.FriendRequestRejectedException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.InvalidUserException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
 import com.snow.oauth2.socialoauth2.model.friend.FriendShip;
@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 
@@ -24,18 +25,20 @@ import java.util.List;
 public class FriendServiceImpl implements FriendService {
 
     private final FriendRepository friendRepository;
-
     private final UserRepository userRepository;
 
     public FriendShip sendFriendRequest(String userId1, String userId2) {
-
         User user1 = userRepository.findById(userId1)
                 .orElseThrow(() -> new UserNotFoundException(userId1));
         User user2 = userRepository.findById(userId2)
                 .orElseThrow(() -> new UserNotFoundException(userId2));
 
-        validateRequestFriendShip(userId1, userId2);
+        FriendShip existingFriendship = validateRequestFriendShip(userId1, userId2);
 
+
+        if (existingFriendship != null) { // Nếu existingFriendship không null, tức là đã có lời mời bị từ chối và được cập nhật
+            return existingFriendship;
+        }
 
         FriendShip friendShipRequest = FriendShip.builder()
                 .userId1(user1.getId())
@@ -46,7 +49,7 @@ public class FriendServiceImpl implements FriendService {
                 .build();
         friendRepository.save(friendShipRequest);
 
-        // 4. Gửi thông báo cho người dùng được mời (tùy chọn, sử dụng WebSocket )
+        // Gửi thông báo cho người dùng được mời (tùy chọn, sử dụng WebSocket )
         return friendShipRequest;
     }
 
@@ -83,6 +86,9 @@ public class FriendServiceImpl implements FriendService {
 
         friendShip.setStatus(friendStatus);
         friendShip.setUpdatedAt(LocalDateTime.now());
+        if (friendStatus == FriendshipStatus.REJECTED) {
+            friendShip.setRejectedAt(LocalDateTime.now()); // Cập nhật rejectedAt khi từ chối
+        }
         friendRepository.save(friendShip);
 
         return FriendStatusUpdateResponseDto.builder()
@@ -102,37 +108,48 @@ public class FriendServiceImpl implements FriendService {
 
 
     //validate
-    private void validateRequestFriendShip(String userId1, String userId2) {
-
-        // 1 kiểm tra có trùng nhau không
+    private FriendShip validateRequestFriendShip(String userId1, String userId2) {
         if (userId1.equals(userId2)) {
             throw new BadRequestException("User id1 and user id2 must be different");
         }
-        FriendShip friendShip = friendRepository.findByUserId1AndUserId2(userId1, userId2);
-        if (friendShip != null) {
-            throw new FriendRequestAlreadyExistsException(userId1, userId2);
+        // Kiểm tra xem có lời mời kết bạn trước đó với trạng thái REJECTED không
+        FriendShip rejectedFriendship = friendRepository.findByUserId1AndUserId2AndStatus(
+                userId1, userId2, FriendshipStatus.REJECTED
+        );
+        if (rejectedFriendship != null) {
+            validateTimeReject(userId1, userId2, rejectedFriendship);
+            return rejectedFriendship; // Trả về rejectedFriendship nếu đã cập nhật
         }
 
-        friendShip = friendRepository.findByUserId1AndUserId2(userId2, userId1);
-        if (friendShip != null) {
-            throw new FriendRequestAlreadyExistsException(userId2, userId1);
+        rejectedFriendship = friendRepository.findByUserId1AndUserId2AndStatus(
+                userId2, userId1, FriendshipStatus.REJECTED
+        );
+        if (rejectedFriendship != null) {
+            validateTimeReject(userId2, userId1, rejectedFriendship);
+            return rejectedFriendship; // Trả về rejectedFriendship nếu đã cập nhật
         }
 
-        // 3. Kiểm tra xem người dùng đã là bạn với nhau chưa
-        List<FriendShip> friendShips = friendRepository.getListOfFriends(userId1);
-        for (FriendShip friend : friendShips) {
-            if (friend.getUserId2().equals(userId2)) {
-                throw new FriendRequestAlreadyExistsException(userId1, userId2);
-            }
-        }
-
-        friendShips = friendRepository.getListOfFriends(userId2);
-        for (FriendShip friend : friendShips) {
-            if (friend.getUserId2().equals(userId1)) {
-                throw new FriendRequestAlreadyExistsException(userId2, userId1);
-            }
-        }
+        return null;
     }
+
+    private void validateTimeReject(String userId1, String userId2, FriendShip rejectedFriendship) {
+        if (rejectedFriendship != null) {
+            LocalDateTime now = LocalDateTime.now();
+            long minutesPassed = ChronoUnit.MINUTES.between(rejectedFriendship.getRejectedAt(), now);
+            if (minutesPassed >= 3) { // Nếu đã đủ 3 phút
+                rejectedFriendship.setStatus(FriendshipStatus.PENDING); // Cập nhật trạng thái
+                rejectedFriendship.setRejectedAt(null); // Xóa rejectedAt
+                friendRepository.save(rejectedFriendship); // Lưu lại
+                return; // Thoát khỏi hàm, không cần kiểm tra thêm
+            } else {
+                long retryAfterSeconds = 180 - minutesPassed * 60;
+                throw new FriendRequestRejectedException(userId1, userId2, retryAfterSeconds);
+            }
+        }
+
+    }
+
+
 }
 
 
