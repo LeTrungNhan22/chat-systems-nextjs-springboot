@@ -34,7 +34,10 @@ const DesktopNavigation = ({ user, logOutUser }: Props) => {
   const paths = useNavigation();
 
   return (
-    <Card className="hidden lg:flex lg:flex-col lg:justify-between lg:items-center lg:px-2 lg:py-4 lg:h-full lg:w-16">
+    <Card
+      className="hidden lg:flex lg:flex-col lg:justify-between lg:items-center
+     lg:px-2 lg:py-4 lg:h-full lg:w-16  bg-gradient-to-b from-indigo-500 "
+    >
       <nav>
         <ul className="flex flex-col items-center gap-4">
           {paths.map((path, id) => {

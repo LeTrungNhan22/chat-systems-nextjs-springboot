@@ -6,9 +6,11 @@ type Props = React.PropsWithChildren<{}>;
 
 function RequestFriendContainer({ children }: Props) {
   return (
-    <Card className="w-full h-[calc(100vh-32px)] lg:h-full p-2 flex flex-col gap-2">
-      {children}
-    </Card>
+    <div className="flex flex-col lg:flex-row h-full w-full gap-4">
+      {React.Children.map(children, (child, index) => (
+        <div className="lg:flex-none flex-1 h-full">{child}</div>
+      ))}
+    </div>
   );
 }
 

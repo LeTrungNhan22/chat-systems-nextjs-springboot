@@ -1,18 +1,26 @@
+"use client";
+
+import { AuthContext } from "@/app/(authentication)/_context/context-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import useAddFriend from "@/hooks/swr/useAddFriend";
+import useFriendRequests from "@/hooks/swr/useFriendRequests";
 import { TUser } from "@/utils/types/users/auth";
+import { useContext, useState } from "react";
 type Props = {
   userSearchItem: TUser;
 };
 
 const UserSearchItem = ({ userSearchItem }: Props) => {
-  const { data, error, isLoading, addFriend } = useAddFriend();
-  
+  const { user } = useContext(AuthContext);
+  const { addFriend } = useAddFriend();
+  const { sentRequests, mutateSent } = useFriendRequests(user?.user.id);
+
   const onHandleAddFriend = (friendId: string) => async () => {
     try {
-      const result = await addFriend(friendId);
+      await addFriend(friendId);
+      mutateSent();
     } catch (error) {
       console.log("Error adding friend: ", error);
     }
@@ -36,13 +44,22 @@ const UserSearchItem = ({ userSearchItem }: Props) => {
             </p>
           </div>
         </div>
-        <Button
-          size={"sm"}
-          onClick={onHandleAddFriend(userSearchItem.id)}
-          variant={"secondary"}
-        >
-          Gửi yêu cầu
-        </Button>
+        {
+          <Button
+            onClick={onHandleAddFriend(userSearchItem.id)}
+            size="default"
+            variant="secondary"
+            disabled={sentRequests.some(
+              (request) => request.userId2 === userSearchItem.id
+            )}
+          >
+            {sentRequests.some(
+              (request) => request.userId2 === userSearchItem.id
+            )
+              ? "Đã gửi "
+              : "Kết bạn"}
+          </Button>
+        }
       </Card>
     </>
   );
