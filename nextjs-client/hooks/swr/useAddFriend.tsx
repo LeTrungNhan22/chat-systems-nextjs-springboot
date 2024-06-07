@@ -16,9 +16,14 @@ const useAddFriend = () => {
       );
       mutate(response.data);
       return response.data; // return response.data
-    } catch (error) {
-      console.log("Error adding friend: ", error);
-      throw error;
+    } catch (error: any) {
+      // error from server
+      if (error.response) {
+        throw error.response.data;
+      } else {
+        // any other error
+        throw error;
+      }
     }
   };
 

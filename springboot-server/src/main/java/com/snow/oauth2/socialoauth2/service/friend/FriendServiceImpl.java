@@ -33,11 +33,20 @@ public class FriendServiceImpl implements FriendService {
         User user2 = userRepository.findById(userId2)
                 .orElseThrow(() -> new UserNotFoundException(userId2));
 
-        FriendShip existingFriendship = validateRequestFriendShip(userId1, userId2);
+
+        FriendShip existingFriendship = friendRepository.findByUserId1AndUserId2OrUserId1AndUserId2AndStatus(
+                userId1, userId2, userId2, userId1, FriendshipStatus.PENDING
+        );
+
+        if (existingFriendship != null) {
+            throw new BadRequestException("A friend request already exists between these users.");
+        }
+
+        FriendShip existingFriendshipRejected = validateRequestFriendShip(userId1, userId2);
 
 
-        if (existingFriendship != null) { // Nếu existingFriendship không null, tức là đã có lời mời bị từ chối và được cập nhật
-            return existingFriendship;
+        if (existingFriendshipRejected != null) { // Nếu existingFriendshipRejected không null, tức là đã có lời mời bị từ chối và được cập nhật
+            return existingFriendshipRejected;
         }
 
         FriendShip friendShipRequest = FriendShip.builder()

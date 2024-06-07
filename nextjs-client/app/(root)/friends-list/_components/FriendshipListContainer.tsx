@@ -1,29 +1,31 @@
 "use client";
-
 import React from "react";
 
 import useFriendRequests from "@/hooks/swr/useFriendRequests";
 import { AuthUser } from "@/utils/types/users/auth";
-import FriendRequestCardReceived from "./FriendRequestCardReceived";
+import FriendshipList from "./FriendshipListItems";
+import FriendshipListItems from "./FriendshipListItems";
+import useGetListFriend from "@/hooks/swr/useGetListFriend";
 
 type Props = React.PropsWithChildren<{
   user: AuthUser | null;
 }>;
-function FriendRequestReceived({ user }: Props) {
-  const { receivedRequests, isLoading, isError, mutateReceived } =
-    useFriendRequests(user?.user.id);
+
+function FriendshipListContainer({ user }: Props) {
+  const { listFriend, isLoading, isError, mutateCurrentList } =
+    useGetListFriend(user?.user.id);
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching friend requests</div>;
 
   return (
-    <>
-      {receivedRequests.length > 0 ? (
-        receivedRequests.map((request) => (
-          <FriendRequestCardReceived
+    <div className="w-full h-[200px] lg:h-full flex flex-col overflow-y-auto gap-2">
+      {listFriend.length > 0 ? (
+        listFriend.map((request) => (
+          <FriendshipListItems
             key={request.id}
             request={request}
-            mutateReceived={mutateReceived}
+            mutateCurrentList={mutateCurrentList}
             currentUserId={user?.user.id}
           />
         ))
@@ -34,8 +36,8 @@ function FriendRequestReceived({ user }: Props) {
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }
 
-export default FriendRequestReceived;
+export default FriendshipListContainer;

@@ -7,22 +7,31 @@ import { Card } from "@/components/ui/card";
 import useAddFriend from "@/hooks/swr/useAddFriend";
 import useFriendRequests from "@/hooks/swr/useFriendRequests";
 import { TUser } from "@/utils/types/users/auth";
-import { useContext, useState } from "react";
+import { useContext } from "react";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
+
 type Props = {
   userSearchItem: TUser;
 };
 
 const UserSearchItem = ({ userSearchItem }: Props) => {
   const { user } = useContext(AuthContext);
-  const { addFriend } = useAddFriend();
+  const { addFriend, error, isLoading } = useAddFriend();
   const { sentRequests, mutateSent } = useFriendRequests(user?.user.id);
-
+  const { toast } = useToast();
   const onHandleAddFriend = (friendId: string) => async () => {
     try {
       await addFriend(friendId);
       mutateSent();
-    } catch (error) {
-      console.log("Error adding friend: ", error);
+    } catch (err: any) {
+      console.log("Error adding friend: ", err.message);
+      toast({
+        variant: "destructive",
+        title: "Có lỗi xảy ra!",
+        description: err.message,
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
     }
   };
 
@@ -44,22 +53,32 @@ const UserSearchItem = ({ userSearchItem }: Props) => {
             </p>
           </div>
         </div>
-        {
-          <Button
-            onClick={onHandleAddFriend(userSearchItem.id)}
-            size="default"
-            variant="secondary"
-            disabled={sentRequests.some(
-              (request) => request.userId2 === userSearchItem.id
-            )}
-          >
-            {sentRequests.some(
-              (request) => request.userId2 === userSearchItem.id
-            )
-              ? "Đã gửi "
-              : "Kết bạn"}
+        {isLoading ? (
+          <Button size="default" variant="secondary" disabled>
+            Đang xử lý...
           </Button>
-        }
+        ) : (
+          <>
+            <Button
+              onClick={onHandleAddFriend(userSearchItem.id)}
+              size="default"
+              variant="secondary"
+              disabled={
+                sentRequests.some(
+                  (request) => request.userId2 === userSearchItem.id
+                ) || isLoading
+              }
+            >
+              <>
+                {sentRequests.some(
+                  (request) => request.userId2 === userSearchItem.id
+                )
+                  ? "Đã gửi "
+                  : "Kết bạn"}
+              </>
+            </Button>
+          </>
+        )}
       </Card>
     </>
   );
