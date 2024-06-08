@@ -28,10 +28,8 @@ public class FriendServiceImpl implements FriendService {
     private final UserRepository userRepository;
 
     public FriendShip sendFriendRequest(String userId1, String userId2) {
-        User user1 = userRepository.findById(userId1)
-                .orElseThrow(() -> new UserNotFoundException(userId1));
-        User user2 = userRepository.findById(userId2)
-                .orElseThrow(() -> new UserNotFoundException(userId2));
+        User user1 = getUserByIdOrThrow(userId1);
+        User user2 = getUserByIdOrThrow(userId2);
 
 
         FriendShip existingFriendship = friendRepository.findByUserId1AndUserId2OrUserId1AndUserId2AndStatus(
@@ -80,8 +78,7 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public FriendStatusUpdateResponseDto updateFriendRequest(String userId2, String userId1, FriendshipStatus friendStatus) {
-        User user = userRepository.findById(userId2)
-                .orElseThrow(() -> new UserNotFoundException(userId2));
+        User user = getUserByIdOrThrow(userId2); // userId2 là người nhận lời mời
 
         FriendShip friendShip = friendRepository.findByUserId1AndUserId2(userId1, userId2);
 
@@ -158,6 +155,11 @@ public class FriendServiceImpl implements FriendService {
 
     }
 
+
+    private User getUserByIdOrThrow(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
 
 }
 

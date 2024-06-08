@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	reactStrictMode: false,
 	redirects: async () => {
 		return [
 			{
@@ -9,13 +10,11 @@ const nextConfig = {
 			},
 		];
 	},
-
 	images: {
 		remotePatterns: [
 			{
 				protocol: 'https',
 				hostname: 'lh3.googleusercontent.com',
-
 			},
 		],
 	},

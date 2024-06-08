@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import useFriendRequests from "@/hooks/swr/useFriendRequests";
+import useFriendRequests from "@/hooks/swr/friend-api/useFriendRequests";
 import { AuthUser } from "@/utils/types/users/auth";
 import React from "react";
 import FriendRequestReceivedCardItem from "./FriendRequestReceivedCardItem";

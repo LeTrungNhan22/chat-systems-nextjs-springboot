@@ -14,7 +14,7 @@ const fetchUserProfile = async (url: string) => {
 
 export default function useUserProfileById(userId: string) {
   const { data, error, isLoading } = useSWR(
-	userId ? `${API_BASE_URL}/api/v1/users/${userId}` : null,
+	userId ? `${API_BASE_URL}/users/${userId}` : null,
     fetchUserProfile,
     { revalidateOnFocus: false }
   );

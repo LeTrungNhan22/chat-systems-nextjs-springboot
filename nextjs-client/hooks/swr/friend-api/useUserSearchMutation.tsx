@@ -8,7 +8,7 @@ const fetcher = (url: string) => axios.get(url).then((res) => res.data.content);
 
 function useUserSearchMutation() {
   const { trigger, isMutating, error } = useSWRMutation(
-    `${API_BASE_URL}/api/v1/users/search`, // Keep the base URL here
+    `${API_BASE_URL}/users/search`, // Keep the base URL here
     (url, { arg }: { arg: string }) => {
       // Pass the query as arg
       return fetcher(`${url}?query=${arg}`);

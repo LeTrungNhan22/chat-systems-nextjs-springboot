@@ -18,8 +18,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useConversation } from "@/hooks/useConversation";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useConversation } from "@/hooks/common/useConversation";
+import { useNavigation } from "@/hooks/common/useNavigation";
 import { AuthUser } from "@/utils/types/users/auth";
 import { LogOut, User } from "lucide-react";
 import Link from "next/link";

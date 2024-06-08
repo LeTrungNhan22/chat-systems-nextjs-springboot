@@ -18,7 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useNavigation } from "@/hooks/common/useNavigation";
 import { AuthUser } from "@/utils/types/users/auth";
 import { LogOut, User } from "lucide-react";
 import Link from "next/link";

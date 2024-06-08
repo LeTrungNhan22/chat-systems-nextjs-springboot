@@ -1,14 +1,9 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, X } from "lucide-react";
 import React from "react";
-import axios from "axios";
-import { API_BASE_URL } from "@/constants";
-import useUserProfileById from "@/hooks/swr/useUserProfileById";
+import useUserProfileById from "@/hooks/swr/friend-api/useUserProfileById";
 import FriendshipAction from "./FriendshipAction";
-import { Badge } from "@/components/ui/badge";
 
 // Custom component for each FriendRequestCard
 function FriendshipListItems({
@@ -20,7 +15,9 @@ function FriendshipListItems({
   mutateCurrentList: any;
   currentUserId: string | undefined;
 }) {
-  const { data: userProfile, isLoading } = useUserProfileById(request.userId1);
+  const otherUserId =
+    request.userId1 === currentUserId ? request.userId2 : request.userId1;
+  const { data: userProfile, isLoading } = useUserProfileById(otherUserId);
 
   return (
     <>
@@ -48,7 +45,10 @@ function FriendshipListItems({
         )}
 
         <div className="flex items-center gap-2">
-          <FriendshipAction />
+          <FriendshipAction
+            otherUserId={otherUserId}
+            currentUserId={currentUserId}
+          />
         </div>
       </Card>
     </>

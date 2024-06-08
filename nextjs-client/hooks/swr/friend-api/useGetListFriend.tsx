@@ -27,8 +27,11 @@ export default function useGetListFriend(userId: string | undefined) {
     error: sentError,
     mutate: mutateCurrentList,
   } = useSWR<FriendRequestsResponse[], any>(
-    userId ? `${API_BASE_URL}/api/v1/friends/${userId}/friends` : undefined,
-    fetcher
+    userId ? `${API_BASE_URL}/friends/${userId}/friends` : undefined,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+    }
   );
   const isLoading = !listFriendByUserId && !sentError;
 

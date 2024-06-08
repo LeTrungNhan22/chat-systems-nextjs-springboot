@@ -32,12 +32,13 @@ export const AuthProvider = ({ children }: Props) => {
   const [isLoading, setIsLoading] = useState(true); // Initial loading state
   const router = useRouter();
   const cookies = useCookies();
+  const [hasFetched, setHasFetched] = useState(false);
 
   const fetchUserProfile = async (token: string) => {
+    if (hasFetched) return;
     try {
       setIsLoading(true); // Start loading
-
-      const response = await fetch(`${API_BASE_URL}/api/v1/users/profile`, {
+      const response = await fetch(`${API_BASE_URL}/users/profile`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -60,6 +61,7 @@ export const AuthProvider = ({ children }: Props) => {
       router.push("/login?error=Failed to fetch user profile");
     } finally {
       setIsLoading(false); // Finish loading in all cases
+      setHasFetched(true);
     }
   };
 

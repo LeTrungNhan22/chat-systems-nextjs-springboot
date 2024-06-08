@@ -3,6 +3,7 @@ package com.snow.oauth2.socialoauth2.service.friend;
 import com.snow.oauth2.socialoauth2.dto.response.FriendStatusUpdateResponseDto;
 import com.snow.oauth2.socialoauth2.model.friend.FriendShip;
 import com.snow.oauth2.socialoauth2.model.friend.FriendshipStatus;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 

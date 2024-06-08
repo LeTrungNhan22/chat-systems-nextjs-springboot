@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import useFriendRequests from "@/hooks/swr/useFriendRequests";
+import useFriendRequests from "@/hooks/swr/friend-api/useFriendRequests";
 import { AuthUser } from "@/utils/types/users/auth";
 import FriendRequestCardSent from "./FriendRequestCardSent";
 

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -28,59 +29,47 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRepository chatRepository;
     private final MongoTemplate mongoTemplate;
 
-    @Override
-    public Chat createChat(String userId, String friendId) {
-        User user1 = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
-        User user2 = userRepository.findById(friendId)
-                .orElseThrow(() -> new UserNotFoundException(friendId));
+    private static final boolean NOT_GROUP_CHAT = false;
 
+    @Override
+    public Chat findOrCreateChat(String userId, String friendId) { // Đổi tên hàm
+        User user1 = getUserByIdOrThrow(userId);
+        User user2 = getUserByIdOrThrow(friendId);
+
+        validateFriendship(user1, user2);
+
+        return findExistingPersonalChat(userId, friendId)
+                .orElseGet(() -> createNewPersonalChat(user1, user2));
+    }
+    private User getUserByIdOrThrow(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+    private void validateFriendship(User user1, User user2){
         if (user1.getId().equals(user2.getId())) {
             throw new BadRequestException("Cannot create chat with yourself");
         }
 
-        if (!friendRepository.existsFriendship(userId, friendId)) {
+        if (!friendRepository.existsFriendship(user1.getId(), user2.getId())) {
             throw new BadRequestException("You are not friend with this user");
         }
 
-        // Kiểm tra xem cuộc trò chuyện đã tồn tại chưa (có thể đã tạo trước đó)
+    }
+    private Optional<Chat> findExistingPersonalChat(String userId, String friendId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("participants").all(Arrays.asList(userId, friendId)));
-        query.addCriteria(Criteria.where("isGroupChat").is(false)); // Chỉ tìm kiếm chat cá nhân
+        query.addCriteria(Criteria.where("isGroupChat").is(NOT_GROUP_CHAT)); // Sử dụng hằng số
+        return Optional.ofNullable(mongoTemplate.findOne(query, Chat.class));
+    }
 
-        Optional<Chat> existingChat = Optional.ofNullable(mongoTemplate.findOne(query, Chat.class));
-
-
-        if (existingChat.isPresent()) {
-            return existingChat.get(); // Trả về cuộc trò chuyện đã tồn tại
-        }
-
-
-//        new chat
+    private Chat createNewPersonalChat(User user1, User user2) {
         Chat newChat = new Chat();
         newChat.setParticipants(Arrays.asList(user1, user2));
-        newChat.setGroupChat(false);
-        newChat.setGroupName(null);
+        newChat.setGroupChat(NOT_GROUP_CHAT);
         newChat.setCreatedAt(LocalDateTime.now());
-        newChat.setUpdatedAt(LocalDateTime.now());
-        newChat.setLastMessage(null);
-        newChat.setUnreadMessagesCount(null);
-        newChat.setAdmin(null);
-        newChat.setAvatar(null);
-
         return chatRepository.save(newChat);
     }
 
-    @Override
-    public User getReceiver(String chatId, String senderId) {
-        Chat chat = chatRepository.findById(chatId)
-                .orElseThrow(() -> new ChatNotFoundException(chatId));
-
-        return chat.getParticipants().stream()
-                .filter(user -> !user.getId().equals(senderId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Receiver not found in chat"));
-    }
 
     @Override
     public Chat getChatById(String chatId) {
@@ -89,19 +78,12 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public String getReceiverId(Chat chat, String senderId) {
-        if (chat.isGroupChat()) {
-            // Nếu là nhóm chat, không cần tìm receiverId
-            return null;
-        } else {
-            // Nếu là chat riêng tư, tìm người nhận là người khác với người gửi
-            return chat.getParticipants().stream()
-                    .filter(user -> !user.getId().equals(senderId))
-                    .findFirst()
-                    .map(User::getId)
-                    .orElseThrow(() -> new IllegalStateException("Receiver not found in chat"));
-        }
+    public List<Chat> getListConversationByUserId(String userId) {
+        return chatRepository.findAllByParticipantsContaining(userId);
     }
+
+//    clean code up
+
 
 
 }

@@ -12,7 +12,7 @@ const useAddFriend = () => {
   const addFriend = async (userId2: string | undefined) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/v1/friends/${user?.user.id}/requests/${userId2}`
+        `${API_BASE_URL}/friends/${user?.user.id}/requests/${userId2}`
       );
       mutate(response.data);
       return response.data; // return response.data

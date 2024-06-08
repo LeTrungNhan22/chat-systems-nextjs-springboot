@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface FriendRepository extends MongoRepository<FriendShip, String> {
 
-    @Query(value = "{$or: [{currentUserId: ?0, requestFriendId: ?1, status: 'ACCEPTED'}, {currentUserId: ?1, requestFriendId: ?0, status: 'ACCEPTED'}]}", exists = true)
+    @Query(value = "{$or: [{userId1: ?0, userId2: ?1, status: 'ACCEPTED'}, {userId1: ?1, userId2: ?0, status: 'ACCEPTED'}]}", exists = true)
     boolean existsFriendship(String currentUserId, String requestFriendId);
 
     @Query("{ $or: [ { userId1: ?0 }, { userId2: ?0 } ], status: 'ACCEPTED' }")

@@ -28,9 +28,11 @@ export default function useFriendRequests(userId: string | undefined) {
     mutate: mutateSent,
   } = useSWR<FriendRequestsResponse[], any>(
     userId
-      ? `${API_BASE_URL}/api/v1/friends/${userId}/requests/sent`
+      ? `${API_BASE_URL}/friends/${userId}/requests/sent`
       : undefined,
-    fetcher
+    fetcher,{
+      revalidateOnFocus: false,
+    }
   );
 
   const {
@@ -39,9 +41,11 @@ export default function useFriendRequests(userId: string | undefined) {
     mutate: mutateReceived,
   } = useSWR<FriendRequestsResponse[], any>(
     userId
-      ? `${API_BASE_URL}/api/v1/friends/${userId}/requests/received`
+      ? `${API_BASE_URL}/friends/${userId}/requests/received`
       : undefined,
-    fetcher
+    fetcher,{
+      revalidateOnFocus: false,
+    }
   );
 
   // isLoading chỉ đúng khi cả 2 requests chưa hoàn thành và không có lỗi.

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,11 +6,39 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import React from "react";
+import { Button } from "@/components/ui/button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-type Props = {};
+import { useCreateConversations } from "@/hooks/swr/conversation-api/useCreateConversations";
 
-const FriendshipAction = (props: Props) => {
+import { useListConversationsByUseId } from "@/hooks/swr/conversation-api/useListConversationByUserId";
+import { useRouter } from "next-nprogress-bar";
+
+type Props = {
+  currentUserId: string | undefined;
+  otherUserId: any;
+};
+
+const FriendshipAction = ({ currentUserId, otherUserId }: Props) => {
+  const { createConversation } = useCreateConversations(
+    currentUserId,
+    otherUserId
+  );
+  const { mutateListConversations } =
+    useListConversationsByUseId(currentUserId);
+  const navigation = useRouter();
+
+  const handleCreateConversation = async () => {
+    try {
+      const data = await createConversation();
+      if (data) {
+        mutateListConversations();
+        navigation.push(`/conversations/${data.id}`);
+      }
+    } catch (err: any) {
+      console.log("Error creating conversation: ", err.message);
+    }
+  };
+
   return (
     <>
       <DropdownMenu>
@@ -21,7 +49,9 @@ const FriendshipAction = (props: Props) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" side="right">
-          <DropdownMenuItem>Nhắn tin </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleCreateConversation}>
+            Nhắn tin
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-red-600">
             Xóa bạn bè

@@ -8,7 +8,7 @@ import axios from "axios";
 import { API_BASE_URL } from "@/constants";
 import useSWR from "swr";
 import { Badge } from "@/components/ui/badge";
-import useUserProfileById from "@/hooks/swr/useUserProfileById";
+import useUserProfileById from "@/hooks/swr/friend-api/useUserProfileById";
 
 const fetchUserProfile = async (url: string) => {
   try {

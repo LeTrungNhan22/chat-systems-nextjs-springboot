@@ -26,9 +26,9 @@ import { UserPlus } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import useUserSearch from "@/hooks/swr/useUserSearchMutation";
+import useUserSearch from "@/hooks/swr/friend-api/useUserSearchMutation";
 import UserSearchItem from "./UserSearchItem";
-import useUserSearchMutation from "@/hooks/swr/useUserSearchMutation";
+import useUserSearchMutation from "@/hooks/swr/friend-api/useUserSearchMutation";
 import { TUser } from "@/utils/types/users/auth";
 import { AuthContext } from "@/app/(authentication)/_context/context-auth";
 

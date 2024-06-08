@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
 
-import useFriendRequests from "@/hooks/swr/useFriendRequests";
+import useFriendRequests from "@/hooks/swr/friend-api/useFriendRequests";
 import { AuthUser } from "@/utils/types/users/auth";
 import FriendshipList from "./FriendshipListItems";
 import FriendshipListItems from "./FriendshipListItems";
-import useGetListFriend from "@/hooks/swr/useGetListFriend";
+import useGetListFriend from "@/hooks/swr/friend-api/useGetListFriend";
 
 type Props = React.PropsWithChildren<{
   user: AuthUser | null;
