@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.configuration;
+package com.snow.oauth2.socialoauth2.configuration.base;
 
 
 import lombok.Data;
@@ -15,7 +15,7 @@ import java.util.List;
 @EnableAsync
 @Configuration
 @ConfigurationProperties(prefix = "app")
-public class AppConfiguration {
+public class AppConfig {
     private List<String> authorizedRedirectUris = new ArrayList<>();
     private String tokenSecret;
     private long tokenExpirationMsec;

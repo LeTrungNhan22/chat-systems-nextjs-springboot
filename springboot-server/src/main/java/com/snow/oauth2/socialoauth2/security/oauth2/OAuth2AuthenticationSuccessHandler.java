@@ -1,6 +1,6 @@
 package com.snow.oauth2.socialoauth2.security.oauth2;
 
-import com.snow.oauth2.socialoauth2.configuration.AppConfiguration;
+import com.snow.oauth2.socialoauth2.configuration.base.AppConfig;
 import com.snow.oauth2.socialoauth2.exception.auth.BadRequestException;
 import com.snow.oauth2.socialoauth2.security.TokenProvider;
 import com.snow.oauth2.socialoauth2.utils.CookieUtils;
@@ -25,7 +25,7 @@ import java.util.Optional;
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final TokenProvider tokenProvider;
-    private final AppConfiguration appConfiguration;
+    private final AppConfig appConfig;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Override
@@ -66,7 +66,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private boolean isAuthorizedRedirectUri(String uri) {
         URI clientRedirectUri = URI.create(uri);
 
-        return appConfiguration.getAuthorizedRedirectUris()
+        return appConfig.getAuthorizedRedirectUris()
                 .stream()
                 .anyMatch(authorizedRedirectUri -> {
                     // Only validate host and port. Let the clients use different paths if they want to

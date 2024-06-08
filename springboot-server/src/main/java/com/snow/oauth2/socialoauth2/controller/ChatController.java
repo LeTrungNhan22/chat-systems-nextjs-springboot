@@ -22,6 +22,7 @@ public class ChatController {
 
     private final ChatService chatService;
 
+
     @PostMapping("/{userId}/{friendId}")
     @Operation(summary = "Create chat")
     public ResponseEntity<ChatDto> createChat(@PathVariable String userId, @PathVariable String friendId) {
@@ -47,4 +48,8 @@ public class ChatController {
         List<ChatDto> chatDtos = chats.stream().map(ChatMapper.INSTANCE::chatToChatDto).collect(Collectors.toList());
         return ResponseEntity.ok(chatDtos);
     }
+
+
+
+
 }

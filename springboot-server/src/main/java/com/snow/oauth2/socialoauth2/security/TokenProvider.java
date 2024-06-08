@@ -1,6 +1,6 @@
 package com.snow.oauth2.socialoauth2.security;
 
-import com.snow.oauth2.socialoauth2.configuration.AppConfiguration;
+import com.snow.oauth2.socialoauth2.configuration.base.AppConfig;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,26 +16,26 @@ import java.util.Date;
 @Component
 public class TokenProvider {
 
-    private final AppConfiguration appConfiguration;
+    private final AppConfig appConfig;
 
 
     public String createToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + appConfiguration.getTokenExpirationMsec());
+        Date expiryDate = new Date(now.getTime() + appConfig.getTokenExpirationMsec());
 
         return Jwts.builder()
                 .setSubject(userPrincipal.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, appConfiguration.getTokenSecret())
+                .signWith(SignatureAlgorithm.HS512, appConfig.getTokenSecret())
                 .compact();
     }
 
 
     public String getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(appConfiguration.getTokenSecret())
+                .setSigningKey(appConfig.getTokenSecret())
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -45,7 +45,7 @@ public class TokenProvider {
 
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(appConfiguration.getTokenSecret()).parseClaimsJws(authToken);
+            Jwts.parser().setSigningKey(appConfig.getTokenSecret()).parseClaimsJws(authToken);
             return true;
         } catch (SignatureException ex) {
             log.error("Invalid JWT signature", ex);

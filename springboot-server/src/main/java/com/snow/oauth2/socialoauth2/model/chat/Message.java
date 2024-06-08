@@ -8,12 +8,14 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Document(collection = "messages")
 public class Message {
     @Id
     private String id;
+
     @DBRef
     private User sender;
     private String messageContent;
@@ -22,6 +24,8 @@ public class Message {
     private MessageStatus status;
     private MessageType messageType;
     @DBRef
-    private Chat chat; // This is the chat to which the message belongs
+    private Chat chat;
+    private List<String> keywords;  // Trường mới để lưu trữ các từ khóa quan trọng (để tìm kiếm nhanh hơn)
+    private boolean isEdited;
 
 }

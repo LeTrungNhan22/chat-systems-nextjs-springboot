@@ -1,25 +1,25 @@
 package com.snow.oauth2.socialoauth2.service.message;
 
-import com.snow.oauth2.socialoauth2.dto.mapper.MessageMapper;
-import com.snow.oauth2.socialoauth2.dto.request.chat.ChatDto;
+import com.snow.oauth2.socialoauth2.dto.request.chat.MessageRequestDto;
+import com.snow.oauth2.socialoauth2.dto.response.MessageResponseDto;
+import com.snow.oauth2.socialoauth2.exception.message.MediaSizeLimitExceededException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
 import com.snow.oauth2.socialoauth2.model.chat.Chat;
 import com.snow.oauth2.socialoauth2.model.chat.Message;
-import com.snow.oauth2.socialoauth2.model.chat.MessageStatus;
+import com.snow.oauth2.socialoauth2.model.chat.MessageType;
 import com.snow.oauth2.socialoauth2.model.user.User;
 import com.snow.oauth2.socialoauth2.repository.ChatRepository;
 import com.snow.oauth2.socialoauth2.repository.MessageRepository;
 import com.snow.oauth2.socialoauth2.repository.UserRepository;
-import com.snow.oauth2.socialoauth2.service.chat.ChatService;
+import com.snow.oauth2.socialoauth2.service.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.Base64;
 
 @Slf4j
 @Service
@@ -27,51 +27,71 @@ import java.time.LocalDateTime;
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
     private final ChatRepository chatRepository;
+    private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
-    private final ChatService chatService;
+    private final RedisService redisService;
 
-    @Autowired
-    private  MessageMapper messageMapper;
 
     @Override
-    public ChatDto.MessageDto sendMessage(String chatId, ChatDto.MessageDto messageDto, String senderId) {
-        try {
-            // 1. Create object message
-            User sender = userRepository.findById(senderId).orElseThrow(() -> new UserNotFoundException(senderId));
-            Message message = messageMapper.messageDtoToMessage(messageDto);
-            message.setSender(sender); // set sender
-            message.setTimestamp(LocalDateTime.now()); // Thêm timestamp
-            message.setChat(chatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException(chatId)));
-            message.setStatus(MessageStatus.SENT); // Thêm status
-            // 2. Lưu tin nhắn vào database
-            message = messageRepository.save(message);
-            // 3. Lấy thông tin chat
-            Chat chat = chatService.getChatById(chatId);
-            // 4. Gửi tin nhắn qua WebSocket (hoặc cơ chế khác)
-            String destination = chat.isGroupChat() ? "/topic/messages/" + chatId : "/queue/messages";
-            ChatDto.MessageDto messageDtoResponse = messageMapper.messageToMessageDto(message);
-            messagingTemplate.convertAndSend(destination, messageDtoResponse);
+    public MessageResponseDto sendMessage(String chatId, MessageRequestDto messageRequestDto, String currentUserId) {
+        // 1. Kiểm tra quyền truy cập chat
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ChatNotFoundException("Chat not found with id: " + chatId));
 
-            return messageDtoResponse;
-        } catch (ChatNotFoundException | UserNotFoundException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            log.error("Error sending message", ex);
-            throw new RuntimeException("Error sending message", ex);
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + currentUserId));
+
+        if (!chat.getParticipants().contains(currentUser)) {
+            throw new AccessDeniedException("You don't have permission to send messages in this chat.");
         }
+
+        // 2. Tạo đối tượng Message
+        Message message = new Message();
+        message.setSender(currentUser);
+        message.setChat(chat);
+        message.setMessageType(messageRequestDto.getMessageType());
+
+        // 3. Xử lý nội dung tin nhắn
+        if (messageRequestDto.getMessageType() == MessageType.TEXT) {
+            message.setMessageContent(messageRequestDto.getContent());
+        } else if (messageRequestDto.getMessageType() == MessageType.IMAGE || messageRequestDto.getMessageType() == MessageType.VIDEO) {
+            byte[] mediaData = Base64.getDecoder().decode(messageRequestDto.getMediaBase64());
+            long mediaSize = mediaData.length;
+            long maxMediaSize = 10 * 1024 * 1024; // 10MB
+
+            if (mediaSize > maxMediaSize) {
+                throw new MediaSizeLimitExceededException("File size exceeds the limit of 10MB.");
+            }
+
+            String mediaUrl = redisService.storeMedia(mediaData);
+            message.setMediaUrl(mediaUrl);
+        }
+
+        // 4. Lưu tin nhắn vào MongoDB
+        message = messageRepository.save(message);
+
+        MessageResponseDto responseDto = messageConvertDto(message);
+
+
+        // 5. Gửi tin nhắn qua WebSocket
+        messagingTemplate.convertAndSend("/topic/chats/" + chatId, message);
+
+        return responseDto;
     }
 
-    @Override
-    public void markMessageAsRead(String chatId, String messageId, String id) {
-
+    private static MessageResponseDto messageConvertDto(Message message) {
+        MessageResponseDto responseDto = new MessageResponseDto();
+        responseDto.setMessageId(message.getId());
+        responseDto.setSenderId(message.getSender().getId());
+        responseDto.setMessageContent(message.getMessageContent());
+        responseDto.setMediaUrl(message.getMediaUrl());
+        responseDto.setTimestamp(message.getTimestamp());
+        responseDto.setStatus(message.getStatus());
+        responseDto.setMessageType(message.getMessageType());
+        return responseDto;
     }
 
-    @Override
-    public MessageHeaders getMessageById(String messageId) {
-        return null;
-    }
 }
 
 

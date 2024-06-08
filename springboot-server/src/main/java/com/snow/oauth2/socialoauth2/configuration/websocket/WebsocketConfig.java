@@ -17,9 +17,8 @@ import java.util.Map;
 
 @Configuration
 @EnableWebSocketMessageBroker
-@Order(Ordered.HIGHEST_PRECEDENCE + 1) // Ưu tiên cấu hình WebSocket
-public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer {
-
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
+public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -31,7 +30,6 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
                     @Override
                     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-
 
                         if (request instanceof org.springframework.http.server.ServletServerHttpRequest) {
                             org.springframework.http.server.ServletServerHttpRequest servletRequest = (org.springframework.http.server.ServletServerHttpRequest) request;
@@ -53,7 +51,7 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
                     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
                         // Do nothing
                         if (exception != null) {
-                            LoggerFactory.getLogger(WebsocketConfiguration.class).error("Error in handshake: " + exception.getMessage());
+                            LoggerFactory.getLogger(WebsocketConfig.class).error("Error in handshake: " + exception.getMessage());
                         }
                     }
                 });

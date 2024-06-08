@@ -30,18 +30,9 @@ public class FriendServiceImpl implements FriendService {
     public FriendShip sendFriendRequest(String userId1, String userId2) {
         User user1 = getUserByIdOrThrow(userId1);
         User user2 = getUserByIdOrThrow(userId2);
-
-
-        FriendShip existingFriendship = friendRepository.findByUserId1AndUserId2OrUserId1AndUserId2AndStatus(
-                userId1, userId2, userId2, userId1, FriendshipStatus.PENDING
-        );
-
-        if (existingFriendship != null) {
-            throw new BadRequestException("A friend request already exists between these users.");
-        }
+        validateExistFriendshipPending(userId1, userId2);
 
         FriendShip existingFriendshipRejected = validateRequestFriendShip(userId1, userId2);
-
 
         if (existingFriendshipRejected != null) { // Nếu existingFriendshipRejected không null, tức là đã có lời mời bị từ chối và được cập nhật
             return existingFriendshipRejected;
@@ -63,10 +54,10 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<FriendShip> getFriendRequests(String userId, boolean isSent) { // Thêm tham số isSent để xác định lấy danh sách gửi đi hay nhận về
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        User user = getUserByIdOrThrow(userId);
 
         List<FriendShip> friendShipRequests;
+
         if (isSent) {
             friendShipRequests = friendRepository.findByUserId1AndStatus(user.getId(), FriendshipStatus.PENDING);
         } else {
@@ -137,6 +128,17 @@ public class FriendServiceImpl implements FriendService {
 
         return null;
     }
+
+    private void validateExistFriendshipPending(String userId1, String userId2) {
+        FriendShip existingFriendship = friendRepository.findByUserId1AndUserId2OrUserId1AndUserId2AndStatus(
+                userId1, userId2, userId2, userId1, FriendshipStatus.PENDING
+        );
+
+        if (existingFriendship != null) {
+            throw new BadRequestException("A friend request already exists between these users.");
+        }
+    }
+
 
     private void validateTimeReject(String userId1, String userId2, FriendShip rejectedFriendship) {
         if (rejectedFriendship != null) {

@@ -1,6 +1,5 @@
 package com.snow.oauth2.socialoauth2.dto.request.chat;
 
-import com.snow.oauth2.socialoauth2.model.chat.MessageType;
 import com.snow.oauth2.socialoauth2.model.user.ProviderType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +17,7 @@ public class ChatDto {
     private List<ParticipantDto> participants; // Thông tin người tham gia
     private boolean isGroupChat;
     private String groupName; // Nếu là nhóm chat
-    private MessageDto lastMessage; // Thông tin tin nhắn cuối cùng
+    private MessageRequestDto lastMessage; // Thông tin tin nhắn cuối cùng
     private Map<String, Integer> unreadMessagesCount; // Số lượng tin nhắn chưa đọc cho mỗi user
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -31,13 +30,5 @@ public class ChatDto {
         private String email;
         private String imageUrl;
         private ProviderType providerType;
-    }
-
-    @Data
-    public static class MessageDto {
-        private String senderId;
-        private String messageContent;
-        private String mediaUrl; // media url if message type is media
-        private MessageType type;
     }
 }

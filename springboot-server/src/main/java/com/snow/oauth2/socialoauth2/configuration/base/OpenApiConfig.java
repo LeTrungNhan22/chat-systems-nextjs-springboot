@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.configuration;
+package com.snow.oauth2.socialoauth2.configuration.base;
 
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;

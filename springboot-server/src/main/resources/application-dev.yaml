@@ -1,7 +1,3 @@
-spring:
-  data:
-    mongodb:
-      uri: mongodb+srv://root:root@cluster0.ecv8yuh.mongodb.net/spring-chat-app?ssl=true&authSource=admin
 # The configuration for the OAuth2 client
 app:
   tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
@@ -14,3 +10,9 @@ logging:
       springframework:
         web:
           socket=DEBUG:
+        data:
+          redis=DEBUG:
+  data:
+    redis:
+      url: redis://default:Fx3RNvVzMILDi6MFJxcj0Z6ufbNv5uNf@redis-14115.c1.asia-northeast1-1.gce.redns.redis-cloud.com:14115
+#Redis configuration

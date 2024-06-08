@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.configuration;
+package com.snow.oauth2.socialoauth2.configuration.mongo;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
