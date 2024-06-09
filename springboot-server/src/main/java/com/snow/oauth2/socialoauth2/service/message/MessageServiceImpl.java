@@ -1,5 +1,6 @@
 package com.snow.oauth2.socialoauth2.service.message;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.snow.oauth2.socialoauth2.dto.request.chat.MessageRequestDto;
 import com.snow.oauth2.socialoauth2.dto.response.MessageResponseDto;
 import com.snow.oauth2.socialoauth2.exception.message.MediaSizeLimitExceededException;
@@ -34,7 +35,7 @@ public class MessageServiceImpl implements MessageService {
 
 
     @Override
-    public MessageResponseDto sendMessage(String chatId, MessageRequestDto messageRequestDto, String currentUserId) {
+    public MessageResponseDto sendMessage(String chatId, MessageRequestDto messageRequestDto, String currentUserId) throws JsonProcessingException {
         // 1. Kiểm tra quyền truy cập chat
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new ChatNotFoundException("Chat not found with id: " + chatId));
@@ -71,13 +72,15 @@ public class MessageServiceImpl implements MessageService {
         // 4. Lưu tin nhắn vào MongoDB
         message = messageRepository.save(message);
 
-        MessageResponseDto responseDto = messageConvertDto(message);
-
-
         // 5. Gửi tin nhắn qua WebSocket
-        messagingTemplate.convertAndSend("/topic/chats/" + chatId, message);
+        try {
+            messagingTemplate.convertAndSend("/topic/chats/" + chatId, messageRequestDto);
 
-        return responseDto;
+        } catch (Exception e) {
+            log.error("Error when sending message to chat: {}", chatId, e);
+
+        }
+        return messageConvertDto(message);
     }
 
     private static MessageResponseDto messageConvertDto(Message message) {

@@ -9,11 +9,8 @@ import TextareaAutosize from "react-textarea-autosize";
 
 type Props = {};
 
-
 const ChatInput = (props: Props) => {
   const form = useForm();
-
- 
 
   return (
     <Card className="w-full p-2 rounded-lg relative">
