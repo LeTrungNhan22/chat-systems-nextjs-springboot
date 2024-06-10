@@ -1,6 +1,9 @@
 package com.snow.oauth2.socialoauth2.configuration.websocket;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.snow.oauth2.socialoauth2.dto.request.chat.MessageRequestDto;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -9,7 +12,9 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.client.standard.WebSocketContainerFactoryBean;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -26,9 +31,11 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
-                .addEndpoint("/ws") // Your WebSocket endpoint
+                .addEndpoint("/ws/chatterbox") // Your WebSocket endpoint
                 .setAllowedOriginPatterns("*")  // Allow all origins (adjust for production)
                 .withSockJS()
+                .setTaskScheduler(new ConcurrentTaskScheduler())
+                .setHeartbeatTime(30000)
                 .setInterceptors(new HandshakeInterceptor() {
 
                     @Override
@@ -42,11 +49,12 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
                             if (originHeader != null && !originHeader.isEmpty()) {
                                 response.getHeaders().add("Access-Control-Allow-Origin", originHeader);
                                 response.getHeaders().add("Access-Control-Allow-Credentials", "true");
+                                response.getHeaders().add("Authorization", headers.getFirst("Authorization"));
                             }
                         }
 
                         // Add the "server" header here
-                        response.getHeaders().add("server", "WebSocket Server");
+                        response.getHeaders().add("server", "WebSocket Chatterbox Server");
                         return true;
                     }
 
@@ -70,8 +78,17 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
-        messageConverters.add(0, new MappingJackson2MessageConverter()); // Thêm vào đầu danh sách
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        ObjectMapper objectMapper = converter.getObjectMapper();
+        objectMapper.registerSubtypes(MessageRequestDto.class); // Đăng ký MessageRequestDto
+        messageConverters.add(0, converter);
         return false;
+    }
+    @Bean
+    public WebSocketContainerFactoryBean createWebSocketContainer() {
+        WebSocketContainerFactoryBean container = new WebSocketContainerFactoryBean();
+        container.setMaxSessionIdleTimeout(60000L); // 1 minute
+        return container;
     }
 
 

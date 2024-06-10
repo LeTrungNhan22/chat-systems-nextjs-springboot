@@ -32,11 +32,10 @@ const Header = ({ currentUserId, conversationId }: Props) => {
           <CircleArrowLeft />
         </Link>
         <Avatar className="w-8 h-8">
-          <AvatarImage src={otherUserInfo.imageUrl} />
+          <AvatarImage src={otherUserInfo?.imageUrl} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
-        <h2 className="font-semibold">{otherUserInfo.username}</h2>
-        
+        <h2 className="font-semibold">{otherUserInfo?.username}</h2>
       </div>
     </Card>
   );

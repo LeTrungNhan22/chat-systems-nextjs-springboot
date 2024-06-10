@@ -6,6 +6,7 @@ import Body from "./_components/body/Body";
 import ChatInput from "./_components/input/ChatInput";
 import { AuthContext } from "@/app/(authentication)/_context/context-auth";
 import { useParams } from "next/navigation";
+import { WebSocketProvider } from "../_context/context-websocket";
 
 type Props = {};
 
@@ -17,11 +18,16 @@ const ConversationDetailPage = (props: Props) => {
 
   return (
     <>
-      <ConversationContainer>
-        <Header currentUserId={currentUserId} conversationId={conversationId} />
-        <Body />
-        <ChatInput />
-      </ConversationContainer>
+      <WebSocketProvider>
+        <ConversationContainer>
+          <Header
+            currentUserId={currentUserId}
+            conversationId={conversationId}
+          />
+          <Body />
+          <ChatInput conversationId={conversationId} />
+        </ConversationContainer>
+      </WebSocketProvider>
     </>
   );
 };

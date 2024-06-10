@@ -3,20 +3,46 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { SendHorizonal } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import TextareaAutosize from "react-textarea-autosize";
+import { MessageRequest } from "../../../_types/MessageRequest";
+import { useWebSocket } from "../../../_context/context-websocket";
 
-type Props = {};
+type Props = {
+  conversationId: string | string[];
+};
 
-const ChatInput = (props: Props) => {
+const ChatInput = ({ conversationId }: Props) => {
   const form = useForm();
+  const { messages, sendMessage, setChatId } = useWebSocket();
 
+  React.useEffect(() => {
+    setChatId(conversationId as string);
+  }, [conversationId]);
+
+  const onSubmit = (data: any) => {
+    const messageRequest: MessageRequest = {
+      content: data?.content,
+      chatId: conversationId,
+      mediaBase64: "",
+      messageType: "TEXT",
+      keywords: [],
+    };
+    console.log(data);
+    console.log(messageRequest);
+    sendMessage(messageRequest, conversationId as string);
+  };
+
+  console.log("message", messages);
   return (
     <Card className="w-full p-2 rounded-lg relative">
       <div className="flex gap-2 items-end w-full">
         <Form {...form}>
-          <form className="flex gap-2 items-end w-full">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex gap-2 items-end w-full"
+          >
             <FormField
               name="content"
               control={form.control}

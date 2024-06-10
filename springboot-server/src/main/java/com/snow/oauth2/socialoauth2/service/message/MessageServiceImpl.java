@@ -8,17 +8,21 @@ import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
 import com.snow.oauth2.socialoauth2.model.chat.Chat;
 import com.snow.oauth2.socialoauth2.model.chat.Message;
+import com.snow.oauth2.socialoauth2.model.chat.MessageStatus;
 import com.snow.oauth2.socialoauth2.model.chat.MessageType;
 import com.snow.oauth2.socialoauth2.model.user.User;
 import com.snow.oauth2.socialoauth2.repository.ChatRepository;
 import com.snow.oauth2.socialoauth2.repository.MessageRepository;
 import com.snow.oauth2.socialoauth2.repository.UserRepository;
+import com.snow.oauth2.socialoauth2.security.TokenProvider;
 import com.snow.oauth2.socialoauth2.service.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Base64;
 
@@ -27,60 +31,79 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
+
     private final MessageRepository messageRepository;
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final RedisService redisService;
+    private final TokenProvider tokenProvider;
 
+    private static final long MAX_MEDIA_SIZE = 10 * 1024 * 1024; // 10MB
 
     @Override
-    public MessageResponseDto sendMessage(String chatId, MessageRequestDto messageRequestDto, String currentUserId) throws JsonProcessingException {
-        // 1. Kiểm tra quyền truy cập chat
+    public MessageResponseDto sendMessage(String chatId, MessageRequestDto messageRequestDto, String authorizationHeader) {
+        String currentUserId = getCurrentUserIdFromJwt(authorizationHeader);
+
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new ChatNotFoundException("Chat not found with id: " + chatId));
 
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + currentUserId));
 
+        validateChatPermission(chat, currentUser);
+
+        Message message = createMessage(currentUser, chat, messageRequestDto);
+        processMediaContent(messageRequestDto, message);
+        message = messageRepository.save(message);
+        MessageResponseDto responseDto = messageConvertDto(message);
+
+        sendMessageViaWebSocket(chatId, responseDto);
+        return responseDto;
+    }
+
+    private String getCurrentUserIdFromJwt(String authorizationHeader) {
+        String jwt = getJwtFromRequest(authorizationHeader);
+        if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+            return tokenProvider.getUserIdFromToken(jwt);
+        } else {
+            return null;
+        }
+    }
+
+    private void validateChatPermission(Chat chat, User currentUser) {
         if (!chat.getParticipants().contains(currentUser)) {
             throw new AccessDeniedException("You don't have permission to send messages in this chat.");
         }
-
-        // 2. Tạo đối tượng Message
+    }
+    private Message createMessage(User currentUser, Chat chat, MessageRequestDto messageRequestDto) {
         Message message = new Message();
         message.setSender(currentUser);
         message.setChat(chat);
         message.setMessageType(messageRequestDto.getMessageType());
-
-        // 3. Xử lý nội dung tin nhắn
+        message.setStatus(MessageStatus.SENT);
         if (messageRequestDto.getMessageType() == MessageType.TEXT) {
             message.setMessageContent(messageRequestDto.getContent());
-        } else if (messageRequestDto.getMessageType() == MessageType.IMAGE || messageRequestDto.getMessageType() == MessageType.VIDEO) {
-            byte[] mediaData = Base64.getDecoder().decode(messageRequestDto.getMediaBase64());
-            long mediaSize = mediaData.length;
-            long maxMediaSize = 10 * 1024 * 1024; // 10MB
+        }
+        return message;
+    }
 
-            if (mediaSize > maxMediaSize) {
+    private void processMediaContent(MessageRequestDto messageRequestDto, Message message) {
+        if (messageRequestDto.getMessageType() == MessageType.IMAGE || messageRequestDto.getMessageType() == MessageType.VIDEO) {
+            byte[] mediaData = Base64.getDecoder().decode(messageRequestDto.getMediaBase64());
+            if (mediaData.length > MAX_MEDIA_SIZE) {
                 throw new MediaSizeLimitExceededException("File size exceeds the limit of 10MB.");
             }
-
             String mediaUrl = redisService.storeMedia(mediaData);
             message.setMediaUrl(mediaUrl);
         }
-
-        // 4. Lưu tin nhắn vào MongoDB
-        message = messageRepository.save(message);
-
-        // 5. Gửi tin nhắn qua WebSocket
+    }
+    private void sendMessageViaWebSocket(String chatId, MessageResponseDto responseDto) {
         try {
-            messagingTemplate.convertAndSend("/topic/chats/" + chatId, messageRequestDto);
-
+            messagingTemplate.convertAndSend("/topic/chats/" + chatId, responseDto);
         } catch (Exception e) {
             log.error("Error when sending message to chat: {}", chatId, e);
-
         }
-        return messageConvertDto(message);
     }
 
     private static MessageResponseDto messageConvertDto(Message message) {
@@ -95,6 +118,12 @@ public class MessageServiceImpl implements MessageService {
         return responseDto;
     }
 
+    private String getJwtFromRequest(String authorizationHeader) {
+        if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        return null;
+    }
 }
 
 
