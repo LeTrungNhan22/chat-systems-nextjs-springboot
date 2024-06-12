@@ -31,8 +31,20 @@ public class ChatServiceImpl implements ChatService {
 
     private static final boolean NOT_GROUP_CHAT = false;
 
+
     @Override
-    public Chat findOrCreateChat(String userId, String friendId) { // Đổi tên hàm
+    public Chat getChatById(String chatId) {
+        return chatRepository.findById(chatId)
+                .orElseThrow(() -> new ChatNotFoundException(chatId));
+    }
+
+    @Override
+    public List<Chat> getListConversationByUserId(String userId) {
+        return chatRepository.findAllByParticipantsContaining(userId);
+    }
+
+    @Override
+    public Chat findOrCreateChat(String userId, String friendId) {
         User user1 = getUserByIdOrThrow(userId);
         User user2 = getUserByIdOrThrow(friendId);
 
@@ -41,11 +53,13 @@ public class ChatServiceImpl implements ChatService {
         return findExistingPersonalChat(userId, friendId)
                 .orElseGet(() -> createNewPersonalChat(user1, user2));
     }
+
     private User getUserByIdOrThrow(String userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
-    private void validateFriendship(User user1, User user2){
+
+    private void validateFriendship(User user1, User user2) {
         if (user1.getId().equals(user2.getId())) {
             throw new BadRequestException("Cannot create chat with yourself");
         }
@@ -55,6 +69,7 @@ public class ChatServiceImpl implements ChatService {
         }
 
     }
+
     private Optional<Chat> findExistingPersonalChat(String userId, String friendId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("participants").all(Arrays.asList(userId, friendId)));
@@ -69,21 +84,6 @@ public class ChatServiceImpl implements ChatService {
         newChat.setCreatedAt(LocalDateTime.now());
         return chatRepository.save(newChat);
     }
-
-
-    @Override
-    public Chat getChatById(String chatId) {
-        return chatRepository.findById(chatId)
-                .orElseThrow(() -> new ChatNotFoundException(chatId));
-    }
-
-    @Override
-    public List<Chat> getListConversationByUserId(String userId) {
-        return chatRepository.findAllByParticipantsContaining(userId);
-    }
-
-//    clean code up
-
 
 
 }

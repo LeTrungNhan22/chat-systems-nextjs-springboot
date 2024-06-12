@@ -31,7 +31,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
-                .addEndpoint("/ws/chatterbox") // Your WebSocket endpoint
+                .addEndpoint("/ws") // Your WebSocket endpoint
                 .setAllowedOriginPatterns("*")  // Allow all origins (adjust for production)
                 .withSockJS()
                 .setTaskScheduler(new ConcurrentTaskScheduler())
@@ -84,6 +84,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
         messageConverters.add(0, converter);
         return false;
     }
+
     @Bean
     public WebSocketContainerFactoryBean createWebSocketContainer() {
         WebSocketContainerFactoryBean container = new WebSocketContainerFactoryBean();

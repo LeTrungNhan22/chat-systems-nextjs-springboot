@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
         servers = {
                 @Server(
                         description = "Local Server",
-                        url = "http://localhost:8080",
+                        url = "http://localhost:8080/chatterbox-system",
                         variables = {}
                 ),
                 @Server(

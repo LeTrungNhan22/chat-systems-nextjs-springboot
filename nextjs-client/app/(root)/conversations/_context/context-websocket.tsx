@@ -35,6 +35,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
       },
       heartbeatIncoming: 30000,
       heartbeatOutgoing: 30000,
+      connectHeaders: {
+        Authorization: `Bearer ${storage.get(ACCESS_TOKEN)}`,
+      },
     });
 
     client.onConnect = (frame) => {

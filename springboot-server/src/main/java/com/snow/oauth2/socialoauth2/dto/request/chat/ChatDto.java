@@ -17,7 +17,7 @@ public class ChatDto {
     private List<ParticipantDto> participants; // Thông tin người tham gia
     private boolean isGroupChat;
     private String groupName; // Nếu là nhóm chat
-    private MessageRequestDto lastMessage; // Thông tin tin nhắn cuối cùng
+    private String lastMessageUserId; // Thông tin tin nhắn cuối cùng
     private Map<String, Integer> unreadMessagesCount; // Số lượng tin nhắn chưa đọc cho mỗi user
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

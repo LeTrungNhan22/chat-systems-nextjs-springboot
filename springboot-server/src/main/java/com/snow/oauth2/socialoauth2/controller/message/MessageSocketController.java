@@ -1,5 +1,6 @@
-package com.snow.oauth2.socialoauth2.controller;
+package com.snow.oauth2.socialoauth2.controller.message;
 
+import com.snow.oauth2.socialoauth2.controller.ChatController;
 import com.snow.oauth2.socialoauth2.dto.request.chat.MessageRequestDto;
 import com.snow.oauth2.socialoauth2.exception.message.MediaSizeLimitExceededException;
 import com.snow.oauth2.socialoauth2.service.message.MessageService;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-public class MessageController {
+public class MessageSocketController {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
@@ -46,5 +47,6 @@ public class MessageController {
 
         }
     }
+
 
 }

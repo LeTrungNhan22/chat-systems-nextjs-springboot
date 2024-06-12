@@ -52,13 +52,17 @@ const FriendRequestReceivedCardItem = ({
         <div>Loading profile...</div>
       ) : userProfile ? (
         <>
-          <Image
-            src={userProfile.imageUrl}
-            alt="avatar"
-            width={110}
-            height={110}
-            className="w-full h-[110px] object-cover rounded-t-lg"
-          />
+          <div className="w-full h-[100px] relative">
+            <Image
+              src={userProfile.imageUrl}
+              alt={userProfile.username}
+              fill // Giữ nguyên fill
+              sizes="100px"
+              loading="lazy"
+              className="object-cover rounded-t-lg"
+              style={{ objectFit: "cover" }} // Thêm objectFit: "cover"
+            />
+          </div>
           <div className="p-2  dark:text-white">
             <h5 className="my-2 text-base font-semibold leading-tight">
               {userProfile.username}

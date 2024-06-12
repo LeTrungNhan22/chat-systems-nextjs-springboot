@@ -3,10 +3,13 @@ package com.snow.oauth2.socialoauth2.controller;
 import com.snow.oauth2.socialoauth2.dto.mapper.ChatMapper;
 import com.snow.oauth2.socialoauth2.dto.request.chat.ChatDto;
 import com.snow.oauth2.socialoauth2.model.chat.Chat;
+import com.snow.oauth2.socialoauth2.model.chat.Message;
 import com.snow.oauth2.socialoauth2.service.chat.ChatService;
+import com.snow.oauth2.socialoauth2.service.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 public class ChatController {
 
     private final ChatService chatService;
+    private final MessageService messageService;
 
 
     @PostMapping("/{userId}/{friendId}")
@@ -39,17 +43,12 @@ public class ChatController {
         return ResponseEntity.ok(chatDto);
     }
 
-
-
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get list of chat by user id")
     public ResponseEntity<List<ChatDto>> getChatByUserId(@PathVariable String userId) {
         List<Chat> chats = chatService.getListConversationByUserId(userId);
         List<ChatDto> chatDtos = chats.stream().map(ChatMapper.INSTANCE::chatToChatDto).collect(Collectors.toList());
         return ResponseEntity.ok(chatDtos);
+
     }
-
-
-
-
 }

@@ -24,7 +24,7 @@ const ConversationDetailPage = (props: Props) => {
             currentUserId={currentUserId}
             conversationId={conversationId}
           />
-          <Body />
+          <Body currentUserId={currentUserId} conversationId={conversationId} />
           <ChatInput conversationId={conversationId} />
         </ConversationContainer>
       </WebSocketProvider>

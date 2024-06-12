@@ -7,13 +7,17 @@ import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 
 @Configuration
-public class MongoConfig implements InitializingBean {
+public class MongoCustomConfig implements InitializingBean {
 
     @Autowired
     private MappingMongoConverter mongoConverter;
+
 
     @Override
     public void afterPropertiesSet() throws Exception {
         mongoConverter.setTypeMapper(new DefaultMongoTypeMapper(null)); // No _class in document
     }
+
+
 }
+

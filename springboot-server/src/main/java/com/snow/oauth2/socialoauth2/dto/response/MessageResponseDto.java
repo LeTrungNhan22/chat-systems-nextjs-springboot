@@ -12,7 +12,7 @@ public class MessageResponseDto {
     private String senderId;
     private String messageContent;
     private String mediaUrl;
-    private LocalDateTime timestamp;
+    private long timestamp;
     private MessageStatus status;
     private MessageType messageType;
 }

@@ -12,7 +12,4 @@ logging:
           socket=DEBUG:
         data:
           redis=DEBUG:
-  data:
-    redis:
-      url: redis://default:Fx3RNvVzMILDi6MFJxcj0Z6ufbNv5uNf@redis-14115.c1.asia-northeast1-1.gce.redns.redis-cloud.com:14115
 #Redis configuration

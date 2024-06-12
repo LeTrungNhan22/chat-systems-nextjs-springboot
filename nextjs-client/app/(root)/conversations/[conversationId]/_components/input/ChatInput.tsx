@@ -29,7 +29,6 @@ const ChatInput = ({ conversationId }: Props) => {
       messageType: "TEXT",
       keywords: [],
     };
-    console.log(data);
     console.log(messageRequest);
     sendMessage(messageRequest, conversationId as string);
   };

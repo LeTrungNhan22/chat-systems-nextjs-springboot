@@ -1,6 +1,5 @@
 package com.snow.oauth2.socialoauth2.service.message;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.snow.oauth2.socialoauth2.dto.request.chat.MessageRequestDto;
 import com.snow.oauth2.socialoauth2.dto.response.MessageResponseDto;
 import com.snow.oauth2.socialoauth2.exception.message.MediaSizeLimitExceededException;
@@ -18,7 +17,8 @@ import com.snow.oauth2.socialoauth2.security.TokenProvider;
 import com.snow.oauth2.socialoauth2.service.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -31,20 +31,21 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
-
     private final MessageRepository messageRepository;
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
+
     private final SimpMessagingTemplate messagingTemplate;
     private final RedisService redisService;
     private final TokenProvider tokenProvider;
-
     private static final long MAX_MEDIA_SIZE = 10 * 1024 * 1024; // 10MB
 
     @Override
     public MessageResponseDto sendMessage(String chatId, MessageRequestDto messageRequestDto, String authorizationHeader) {
+        //      Get current user id from JWT
         String currentUserId = getCurrentUserIdFromJwt(authorizationHeader);
 
+        //      validate chat permission
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new ChatNotFoundException("Chat not found with id: " + chatId));
 
@@ -53,13 +54,28 @@ public class MessageServiceImpl implements MessageService {
 
         validateChatPermission(chat, currentUser);
 
+        //        handle message
         Message message = createMessage(currentUser, chat, messageRequestDto);
         processMediaContent(messageRequestDto, message);
         message = messageRepository.save(message);
-        MessageResponseDto responseDto = messageConvertDto(message);
 
+        // Cập nhật lastMessage sau khi lưu message (lazy update)
+        chat.setLastMessageUserId(currentUser.getId());
+        chatRepository.save(chat);
+
+        MessageResponseDto responseDto = messageConvertDto(message);
         sendMessageViaWebSocket(chatId, responseDto);
         return responseDto;
+    }
+
+    @Override
+    public Page<Message> findAll(Pageable pageable) {
+        return messageRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Message> findByChatId(String chatId, Pageable pageable) {
+        return messageRepository.findByChatId(chatId, pageable);
     }
 
     private String getCurrentUserIdFromJwt(String authorizationHeader) {
@@ -76,12 +92,14 @@ public class MessageServiceImpl implements MessageService {
             throw new AccessDeniedException("You don't have permission to send messages in this chat.");
         }
     }
+
     private Message createMessage(User currentUser, Chat chat, MessageRequestDto messageRequestDto) {
         Message message = new Message();
         message.setSender(currentUser);
         message.setChat(chat);
         message.setMessageType(messageRequestDto.getMessageType());
         message.setStatus(MessageStatus.SENT);
+        message.setTimestamp(System.currentTimeMillis());
         if (messageRequestDto.getMessageType() == MessageType.TEXT) {
             message.setMessageContent(messageRequestDto.getContent());
         }
@@ -98,6 +116,7 @@ public class MessageServiceImpl implements MessageService {
             message.setMediaUrl(mediaUrl);
         }
     }
+
     private void sendMessageViaWebSocket(String chatId, MessageResponseDto responseDto) {
         try {
             messagingTemplate.convertAndSend("/topic/chats/" + chatId, responseDto);
@@ -117,6 +136,7 @@ public class MessageServiceImpl implements MessageService {
         responseDto.setMessageType(message.getMessageType());
         return responseDto;
     }
+
 
     private String getJwtFromRequest(String authorizationHeader) {
         if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
