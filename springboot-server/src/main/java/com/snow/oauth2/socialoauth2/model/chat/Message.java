@@ -1,6 +1,7 @@
 package com.snow.oauth2.socialoauth2.model.chat;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.snow.oauth2.socialoauth2.model.user.User;
 import lombok.Data;
 import org.springframework.data.annotation.Id;

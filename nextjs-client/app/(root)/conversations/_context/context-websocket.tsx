@@ -1,13 +1,16 @@
 "use client";
-import { MessageRequest } from "@/app/(root)/conversations/_types/MessageRequest";
-import { ACCESS_TOKEN, WEBSOCKET_ENDPOINT } from "@/constants";
 import { createContext, useContext, useEffect, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { useCookies } from "next-client-cookies";
 
+import getMessageById from "@/hooks/api/getMessageById";
+import { ACCESS_TOKEN, WEBSOCKET_ENDPOINT } from "@/constants";
+import { MessageRequest } from "../_types/MessageTypes";
+import { MessageSocketResponse } from "../_types/MessageTypes";
+
 interface WebSocketContextValue {
-  messages: MessageRequest[];
+  messages: any[];
   sendMessage: (message: MessageRequest, conversationId: string) => void;
   setChatId: (chatId: string) => void;
 }
@@ -19,7 +22,7 @@ const WebSocketContext = createContext<WebSocketContextValue | undefined>(
 export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [messages, setMessages] = useState<MessageRequest[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [stompClient, setStompClient] = useState<Client | null>(null);
   const [chatId, setChatId] = useState<string | null>(null);
 
@@ -45,7 +48,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
       if (stompClient && chatId) {
         client.subscribe(`/topic/chats/${chatId}`, (message) => {
           const newMessageResponse = JSON.parse(message.body);
-          setMessages((prev) => [...prev, newMessageResponse]);
+          fetchAndAddMessage(newMessageResponse.messageId);
         });
       }
     };
@@ -66,10 +69,19 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [chatId]);
 
-  console.log("chatId", chatId);
+  async function fetchAndAddMessage(messageId: string) {
+    try {
+      const messageFromApi = await getMessageById(messageId); // Hàm này sẽ gọi API của bạn để lấy chi tiết tin nhắn
+
+      setMessages((prev) => [...prev, messageFromApi]); // Cập nhật state messages
+    } catch (error) {
+      console.error("Error fetching message:", error); // Xử lý lỗi nếu có
+    }
+  }
 
   const sendMessage = (messageRequest: MessageRequest, chatId: string) => {
     if (stompClient) {
+      console.info("send to chat id :", chatId);
       const token = storage.get(ACCESS_TOKEN);
       stompClient.publish({
         destination: `/app/chats/${chatId}/sendMessage`,
@@ -78,8 +90,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("message sent", messageRequest);
-      console.log("chatId", chatId);
     }
   };
 

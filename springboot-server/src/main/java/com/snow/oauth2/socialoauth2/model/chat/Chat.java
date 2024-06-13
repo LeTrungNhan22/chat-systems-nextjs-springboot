@@ -23,7 +23,7 @@ public class Chat {
     private String groupName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String lastMessageUserId;
+    private LastMessage lastMessageByUser;
     private Map<String, Integer> unreadMessagesCount;
     @DBRef
     private User admin; // Chỉ có ý nghĩa khi isGroupChat = true

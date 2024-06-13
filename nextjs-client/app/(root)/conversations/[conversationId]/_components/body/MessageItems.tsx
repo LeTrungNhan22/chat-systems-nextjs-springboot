@@ -11,16 +11,12 @@ type Props = {
 };
 
 const MessageItems = ({ message, currentUserId }: Props) => {
-  const { chat, sender } = message;
+  const { chat, sender, messageType } = message;
   const fromCurrentUser = currentUserId === sender?.id;
   const formattedDate = format(new Date(message.timestamp), "HH:mm");
+  const lastMessageByUser = chat?.lastMessageByUser?.sender?.id === sender?.id;
 
-console.log("message", message);
-
-
-  
-  
-
+  console.log("message", message);
   console.log("message", message);
   console.log("currentUserId", fromCurrentUser);
 
@@ -37,14 +33,26 @@ console.log("message", message);
         })}
       >
         <div
-          className={cn("px-4 py-2 rounded-lg max-w-[70%]", {
+          className={cn("px-4 py-2 rounded-lg max-w-[70%] shadow-md", {
             "bg-primary text-primary-foreground": fromCurrentUser,
-            "text-secondary-foreground": !fromCurrentUser,
-            "rounded-br-none": fromCurrentUser,
+            "bg-gradient text-secondary-foreground ": !fromCurrentUser,
+            "rounded-br-none": !lastMessageByUser && fromCurrentUser,
+            "rounded-bl-none": !lastMessageByUser && !fromCurrentUser,
           })}
         >
-          <p className="text-wrap break-words whitespace-pre-wrap">
-            {message?.messageContent}
+          {messageType === "TEXT" ? (
+            <p className="text-wrap break-words whitespace-pre-wrap">
+              {message?.messageContent}
+            </p>
+          ) : null}
+
+          <p
+            className={cn("text-xs flex w-full my-1", {
+              "text-primary-foreground justify-end": fromCurrentUser,
+              "text-secondary-foreground justify-start": !fromCurrentUser,
+            })}
+          >
+            {formattedDate}
           </p>
         </div>
       </div>
@@ -53,6 +61,7 @@ console.log("message", message);
         className={cn("relative w-8 h-8", {
           "order-2": fromCurrentUser,
           "order-0": !fromCurrentUser,
+          invisible: lastMessageByUser,
         })}
       >
         <AvatarImage src={sender?.imageUrl} alt={sender?.name} />

@@ -3,6 +3,7 @@ package com.snow.oauth2.socialoauth2.exception;
 import com.snow.oauth2.socialoauth2.exception.auth.BadRequestException;
 import com.snow.oauth2.socialoauth2.exception.friendship.FriendRequestAlreadyExistsException;
 import com.snow.oauth2.socialoauth2.exception.friendship.FriendRequestRejectedException;
+import com.snow.oauth2.socialoauth2.exception.message.MessageNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.InvalidUserException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.ResourceNotFoundException;
@@ -82,6 +83,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleFriendRequestRejectedException(FriendRequestRejectedException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MessageNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleMessageNotFoundException(MessageNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
 

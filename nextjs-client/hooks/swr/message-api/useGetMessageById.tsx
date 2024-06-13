@@ -1,4 +1,5 @@
 import useSWR from "swr";
+
 import axios from "axios";
 import { API_BASE_URL } from "@/constants";
 
@@ -7,15 +8,11 @@ const fetcher = async (url: string) => {
   return res.data;
 };
 
-export const useGetMessagesByChatId = (chatId: string[] | string) => {
-  const { data, error } = useSWR(
-    `${API_BASE_URL}/messages/by-chat/${chatId}`,
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-    }
-  );
+const useGetMessageById = (id: string) => {
+  const { data, error } = useSWR(`${API_BASE_URL}/messages/${id}`, fetcher, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+  });
 
   return {
     responseMessageApi: data,
@@ -24,3 +21,5 @@ export const useGetMessagesByChatId = (chatId: string[] | string) => {
     isError: error,
   };
 };
+
+export default useGetMessageById;

@@ -6,20 +6,24 @@ import { SendHorizonal } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import TextareaAutosize from "react-textarea-autosize";
-import { MessageRequest } from "../../../_types/MessageRequest";
+import { MessageRequest } from "../../../_types/MessageTypes";
 import { useWebSocket } from "../../../_context/context-websocket";
+import { useListConversationsByUseId } from "@/hooks/swr/conversation-api/useListConversationByUserId";
 
 type Props = {
+  handleSendMessage: (message: MessageRequest, conversationId: string) => void; // Thêm handleSendMessage vào Props
   conversationId: string | string[];
+  currentUserId: string | undefined;
 };
 
-const ChatInput = ({ conversationId }: Props) => {
+const ChatInput = ({
+  handleSendMessage,
+  conversationId,
+  currentUserId,
+}: Props) => {
   const form = useForm();
-  const { messages, sendMessage, setChatId } = useWebSocket();
-
-  React.useEffect(() => {
-    setChatId(conversationId as string);
-  }, [conversationId]);
+  const { mutateListConversations } =
+    useListConversationsByUseId(currentUserId);
 
   const onSubmit = (data: any) => {
     const messageRequest: MessageRequest = {
@@ -29,11 +33,10 @@ const ChatInput = ({ conversationId }: Props) => {
       messageType: "TEXT",
       keywords: [],
     };
-    console.log(messageRequest);
-    sendMessage(messageRequest, conversationId as string);
+    mutateListConversations();
+    handleSendMessage(messageRequest, conversationId as string);
+    form.reset();
   };
-
-  console.log("message", messages);
   return (
     <Card className="w-full p-2 rounded-lg relative">
       <div className="flex gap-2 items-end w-full">

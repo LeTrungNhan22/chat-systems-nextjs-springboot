@@ -1,5 +1,6 @@
 package com.snow.oauth2.socialoauth2.dto.request.chat;
 
+import com.snow.oauth2.socialoauth2.model.chat.LastMessage;
 import com.snow.oauth2.socialoauth2.model.user.ProviderType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,11 +14,11 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatDto {
-    private String id; // ID của cuộc trò chuyện
+    private String id;
     private List<ParticipantDto> participants; // Thông tin người tham gia
     private boolean isGroupChat;
     private String groupName; // Nếu là nhóm chat
-    private String lastMessageUserId; // Thông tin tin nhắn cuối cùng
+    private LastMessage lastMessageByUser; // Thông tin tin nhắn cuối cùng
     private Map<String, Integer> unreadMessagesCount; // Số lượng tin nhắn chưa đọc cho mỗi user
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

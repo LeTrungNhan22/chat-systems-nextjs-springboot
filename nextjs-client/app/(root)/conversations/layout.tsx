@@ -13,8 +13,7 @@ type Props = React.PropsWithChildren<{}>;
 const ConversationLayout = ({ children }: Props) => {
   const user = React.useContext(AuthContext);
   const currentUserId = user?.user?.user.id;
-  const { data, isError, isLoading } =
-    useListConversationsByUseId(currentUserId);
+  const { data, isError, isLoading  } = useListConversationsByUseId(currentUserId);
 
   {
     isLoading && <p>{HANDLE_PENDING}</p>;
@@ -25,16 +24,18 @@ const ConversationLayout = ({ children }: Props) => {
 
   return (
     <>
-      <ItemList title="Cuộc trò chuyện">
-        <Separator className="my-2" />
-        {data && (
-          <DMConversations
-            conversationsList={data}
-            currentUserId={currentUserId}
-          />
-        )}
-      </ItemList>
-      {children}
+      <WebSocketProvider>
+        <ItemList title="Cuộc trò chuyện">
+          <Separator className="my-2" />
+          {data && (
+            <DMConversations
+              conversationsList={data}
+              currentUserId={currentUserId}
+            />
+          )}
+        </ItemList>
+        {children}
+      </WebSocketProvider>
     </>
   );
 };

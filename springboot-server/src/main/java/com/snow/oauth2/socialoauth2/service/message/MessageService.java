@@ -14,4 +14,6 @@ public interface MessageService {
     Page<Message> findAll(Pageable pageable);
 
     Page<Message> findByChatId(String chatId, Pageable pageable);
+
+    Message findById(String id);
 }

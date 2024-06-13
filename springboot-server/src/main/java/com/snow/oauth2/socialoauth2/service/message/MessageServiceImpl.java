@@ -5,10 +5,7 @@ import com.snow.oauth2.socialoauth2.dto.response.MessageResponseDto;
 import com.snow.oauth2.socialoauth2.exception.message.MediaSizeLimitExceededException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
-import com.snow.oauth2.socialoauth2.model.chat.Chat;
-import com.snow.oauth2.socialoauth2.model.chat.Message;
-import com.snow.oauth2.socialoauth2.model.chat.MessageStatus;
-import com.snow.oauth2.socialoauth2.model.chat.MessageType;
+import com.snow.oauth2.socialoauth2.model.chat.*;
 import com.snow.oauth2.socialoauth2.model.user.User;
 import com.snow.oauth2.socialoauth2.repository.ChatRepository;
 import com.snow.oauth2.socialoauth2.repository.MessageRepository;
@@ -59,13 +56,26 @@ public class MessageServiceImpl implements MessageService {
         processMediaContent(messageRequestDto, message);
         message = messageRepository.save(message);
 
-        // Cập nhật lastMessage sau khi lưu message (lazy update)
-        chat.setLastMessageUserId(currentUser.getId());
+        processChatLastMessage(messageRequestDto, currentUser, message, chat);
+
         chatRepository.save(chat);
+
 
         MessageResponseDto responseDto = messageConvertDto(message);
         sendMessageViaWebSocket(chatId, responseDto);
         return responseDto;
+    }
+
+    private static void processChatLastMessage(MessageRequestDto messageRequestDto, User currentUser, Message message, Chat chat) {
+        LastMessage lastMessage = LastMessage.builder()
+                .senderId(currentUser)
+                .content(messageRequestDto.getContent())
+                .timestamp(message.getTimestamp())
+                .status(message.getStatus())
+                .type(message.getMessageType())
+                .build();
+
+        chat.setLastMessageByUser(lastMessage);
     }
 
     @Override
@@ -76,6 +86,12 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Page<Message> findByChatId(String chatId, Pageable pageable) {
         return messageRepository.findByChatId(chatId, pageable);
+    }
+
+    @Override
+    public Message findById(String id) {
+        return messageRepository.findById(id)
+                .orElseThrow(() -> new ChatNotFoundException("Message not found with id: " + id));
     }
 
     private String getCurrentUserIdFromJwt(String authorizationHeader) {

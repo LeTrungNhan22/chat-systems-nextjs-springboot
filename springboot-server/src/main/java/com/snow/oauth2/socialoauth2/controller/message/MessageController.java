@@ -49,4 +49,10 @@ public class MessageController {
         return ResponseEntity.ok(PagedResponse.PageConverter.toCustomPage(messagePage)); // Chuyển đổi thành PagedResponse
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get message by id")
+    public ResponseEntity<Message> getMessageById(@PathVariable String id) {
+        return ResponseEntity.ok(messageService.findById(id)); // Tìm tin nhắn theo id
+    }
+
 }
