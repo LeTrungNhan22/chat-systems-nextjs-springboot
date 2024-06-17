@@ -1,12 +1,10 @@
-package com.snow.oauth2.socialoauth2.dto.request;
+package com.snow.oauth2.socialoauth2.dto.request.notification;
 
-import com.snow.oauth2.socialoauth2.model.notifications.NotificationType;
+import com.snow.oauth2.socialoauth2.model.notification.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 
 @Data

@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.model;
+package com.snow.oauth2.socialoauth2.model.page;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +17,7 @@ public class PagedResponse<T> {
     private long totalElements;
 
 
-    public class PageConverter {
+    public static class PageConverter {
         public static <T> PagedResponse<T> toCustomPage(Page<T> page) {
             return new PagedResponse<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
         }

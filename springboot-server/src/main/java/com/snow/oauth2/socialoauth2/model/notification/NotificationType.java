@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.model.notifications;
+package com.snow.oauth2.socialoauth2.model.notification;
 
 public enum NotificationType {
     FRIEND_REQUEST,

@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.model.notifications;
+package com.snow.oauth2.socialoauth2.model.notification;
 
 import com.snow.oauth2.socialoauth2.model.user.User;
 import lombok.Data;

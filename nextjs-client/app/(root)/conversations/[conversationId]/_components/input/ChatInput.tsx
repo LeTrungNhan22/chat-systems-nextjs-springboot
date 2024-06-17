@@ -36,6 +36,7 @@ const ChatInput = ({
     mutateListConversations();
     handleSendMessage(messageRequest, conversationId as string);
     form.reset();
+    form.setValue("content", "");
   };
   return (
     <Card className="w-full p-2 rounded-lg relative">

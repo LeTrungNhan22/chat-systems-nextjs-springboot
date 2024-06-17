@@ -1,5 +1,6 @@
 package com.snow.oauth2.socialoauth2.exception;
 
+import com.mongodb.MongoSocketReadTimeoutException;
 import com.snow.oauth2.socialoauth2.exception.auth.BadRequestException;
 import com.snow.oauth2.socialoauth2.exception.friendship.FriendRequestAlreadyExistsException;
 import com.snow.oauth2.socialoauth2.exception.friendship.FriendRequestRejectedException;
@@ -8,6 +9,7 @@ import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.InvalidUserException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.ResourceNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,13 +25,8 @@ import java.util.Map;
 
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(ItemPastDueException.class)
-    public ResponseEntity<?> handleItemPastDueException(ItemPastDueException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
 
     @ExceptionHandler(FriendRequestAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleFriendRequestAlreadyExistsException(FriendRequestAlreadyExistsException ex) {
@@ -91,6 +88,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(MongoSocketReadTimeoutException.class)
+    public ResponseEntity<String> handleMongoTimeout(MongoSocketReadTimeoutException ex) {
+        log.error("MongoDB timeout occurred", ex);
+        return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body("MongoDB timeout occurred");
+    }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(MethodArgumentNotValidException.class)

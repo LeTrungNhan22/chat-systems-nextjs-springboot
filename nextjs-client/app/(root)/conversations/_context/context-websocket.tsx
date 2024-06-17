@@ -7,7 +7,6 @@ import { useCookies } from "next-client-cookies";
 import getMessageById from "@/hooks/api/getMessageById";
 import { ACCESS_TOKEN, WEBSOCKET_ENDPOINT } from "@/constants";
 import { MessageRequest } from "../_types/MessageTypes";
-import { MessageSocketResponse } from "../_types/MessageTypes";
 
 interface WebSocketContextValue {
   messages: any[];

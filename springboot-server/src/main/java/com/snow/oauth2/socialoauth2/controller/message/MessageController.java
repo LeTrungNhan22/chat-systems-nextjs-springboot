@@ -1,6 +1,6 @@
 package com.snow.oauth2.socialoauth2.controller.message;
 
-import com.snow.oauth2.socialoauth2.model.PagedResponse;
+import com.snow.oauth2.socialoauth2.model.page.PagedResponse;
 import com.snow.oauth2.socialoauth2.model.chat.Message;
 import com.snow.oauth2.socialoauth2.service.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;

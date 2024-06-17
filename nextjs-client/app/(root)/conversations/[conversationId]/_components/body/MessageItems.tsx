@@ -16,13 +16,13 @@ const MessageItems = ({ message, currentUserId }: Props) => {
   const formattedDate = format(new Date(message.timestamp), "HH:mm");
   const lastMessageByUser = chat?.lastMessageByUser?.sender?.id === sender?.id;
 
-  console.log("message", message);
-  console.log("message", message);
-  console.log("currentUserId", fromCurrentUser);
+  // console.log("message", message);
+  // console.log("message", message);
+  // console.log("currentUserId", fromCurrentUser);
 
   return (
     <div
-      className={cn("flex items-end ", {
+      className={cn("flex items-end", {
         "justify-end": fromCurrentUser,
       })}
     >
@@ -33,12 +33,15 @@ const MessageItems = ({ message, currentUserId }: Props) => {
         })}
       >
         <div
-          className={cn("px-4 py-2 rounded-lg max-w-[70%] shadow-md", {
-            "bg-primary text-primary-foreground": fromCurrentUser,
-            "bg-gradient text-secondary-foreground ": !fromCurrentUser,
-            "rounded-br-none": !lastMessageByUser && fromCurrentUser,
-            "rounded-bl-none": !lastMessageByUser && !fromCurrentUser,
-          })}
+          className={cn(
+            "px-4 py-2 rounded-lg  min-w-0  max-w-[70%] shadow-md",
+            {
+              "bg-primary text-primary-foreground": fromCurrentUser,
+              "bg-gradient text-secondary-foreground ": !fromCurrentUser,
+              "rounded-br-none": !lastMessageByUser && fromCurrentUser,
+              "rounded-bl-none": !lastMessageByUser && !fromCurrentUser,
+            }
+          )}
         >
           {messageType === "TEXT" ? (
             <p className="text-wrap break-words whitespace-pre-wrap">

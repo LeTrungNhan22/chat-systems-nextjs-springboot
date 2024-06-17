@@ -9,7 +9,7 @@ type Props = {
   isError: boolean;
 };
 
-const Body = memo(function ChatBody({
+const Body = memo(function Body({
   currentUserId,
   content,
   isLoading,
@@ -21,10 +21,10 @@ const Body = memo(function ChatBody({
   {
     isError && <h1>{HANDLE_ERROR}</h1>;
   }
-  console.log("messagesList", content);
+  // console.log("messagesList", content);
 
   return (
-    <div className="flex-1 flex-col-reverse flex w-full overflow-y-scroll gap-2 p-3 no-scrollbar">
+    <div className="flex-1 flex-col-reverse  flex w-full overflow-y-scroll gap-2 p-3  no-scrollbar">
       {content.length !== 0 &&
         content?.map((message: any) => (
           <MessageItems

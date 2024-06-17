@@ -12,8 +12,8 @@ export const useGetMessagesByChatId = (chatId: string[] | string) => {
     `${API_BASE_URL}/messages/by-chat/${chatId}`,
     fetcher,
     {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
     }
   );
 
