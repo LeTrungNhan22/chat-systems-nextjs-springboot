@@ -2,7 +2,6 @@ package com.snow.oauth2.socialoauth2.service.message;
 
 import com.snow.oauth2.socialoauth2.dto.request.chat.MessageRequestDto;
 import com.snow.oauth2.socialoauth2.dto.response.MessageResponseDto;
-import com.snow.oauth2.socialoauth2.exception.message.MediaSizeLimitExceededException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
 import com.snow.oauth2.socialoauth2.model.chat.*;
@@ -11,7 +10,6 @@ import com.snow.oauth2.socialoauth2.repository.ChatRepository;
 import com.snow.oauth2.socialoauth2.repository.MessageRepository;
 import com.snow.oauth2.socialoauth2.repository.UserRepository;
 import com.snow.oauth2.socialoauth2.security.TokenProvider;
-import com.snow.oauth2.socialoauth2.service.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,8 +18,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.Base64;
 
 @Slf4j
 @Service
@@ -33,9 +29,7 @@ public class MessageServiceImpl implements MessageService {
     private final UserRepository userRepository;
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final RedisService redisService;
     private final TokenProvider tokenProvider;
-    private static final long MAX_MEDIA_SIZE = 10 * 1024 * 1024; // 10MB
 
     @Override
     public MessageResponseDto sendMessage(String chatId, MessageRequestDto messageRequestDto, String authorizationHeader) {
@@ -46,21 +40,22 @@ public class MessageServiceImpl implements MessageService {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new ChatNotFoundException("Chat not found with id: " + chatId));
 
+        assert currentUserId != null;
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + currentUserId));
 
         validateChatPermission(chat, currentUser);
 
-        //        handle message
+        // Khởi tạo message và lưu vào database
         Message message = createMessage(currentUser, chat, messageRequestDto);
-        processMediaContent(messageRequestDto, message);
         message = messageRepository.save(message);
 
+        // Chỉ xử lý và lưu media khi là ảnh hoặc video và message đã được lưu
+        if ((messageRequestDto.getMessageType() == MessageType.IMAGE || messageRequestDto.getMessageType() == MessageType.VIDEO) && message.getId() != null) {
+            processMediaContent(messageRequestDto, chat, message);
+        }
         processChatLastMessage(messageRequestDto, currentUser, message, chat);
-
         chatRepository.save(chat);
-
-
         MessageResponseDto responseDto = messageConvertDto(message);
         sendMessageViaWebSocket(chatId, responseDto);
         return responseDto;
@@ -74,6 +69,10 @@ public class MessageServiceImpl implements MessageService {
                 .status(message.getStatus())
                 .type(message.getMessageType())
                 .build();
+
+        if (messageRequestDto.getMessageType() == MessageType.IMAGE || messageRequestDto.getMessageType() == MessageType.VIDEO) {
+            lastMessage.setContent(currentUser.getId() + " sent a media file");
+        }
 
         chat.setLastMessageByUser(lastMessage);
     }
@@ -122,16 +121,23 @@ public class MessageServiceImpl implements MessageService {
         return message;
     }
 
-    private void processMediaContent(MessageRequestDto messageRequestDto, Message message) {
-        if (messageRequestDto.getMessageType() == MessageType.IMAGE || messageRequestDto.getMessageType() == MessageType.VIDEO) {
-            byte[] mediaData = Base64.getDecoder().decode(messageRequestDto.getMediaBase64());
-            if (mediaData.length > MAX_MEDIA_SIZE) {
-                throw new MediaSizeLimitExceededException("File size exceeds the limit of 10MB.");
-            }
-            String mediaUrl = redisService.storeMedia(mediaData);
-            message.setMediaUrl(mediaUrl);
-        }
+    private void processMediaContent(MessageRequestDto messageRequestDto, Chat chat, Message message) {
+//        if (messageRequestDto.getMediaBase64().length() > MAX_MEDIA_SIZE) {
+//            throw new MediaSizeLimitExceededException("Media size exceeds the limit of 10MB");
+//        }
+//
+//        String mediaUrl = redisService.appendMediaChunk(chat, messageRequestDto, message);
+//        if (mediaUrl != null) {
+//            // Update the existing message with the media URL
+//            message.setMediaUrl(mediaUrl);
+//            messageRepository.save(message);
+//            redisService.deleteMediaChunks(chat, messageRequestDto);
+//        } else {
+//            // If not all chunks received, don't save the message yet
+//            messageRepository.delete(message);
+//        }
     }
+
 
     private void sendMessageViaWebSocket(String chatId, MessageResponseDto responseDto) {
         try {

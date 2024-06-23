@@ -20,7 +20,6 @@ const ConversationDetailPage = (props: Props) => {
     useGetMessagesByChatId(conversationId);
   const { messages, sendMessage, setChatId } = useWebSocket(); // Lấy messages từ WebSocket context
 
-
   useEffect(() => {
     setChatId(conversationId as string);
   }, [conversationId]);
@@ -28,12 +27,22 @@ const ConversationDetailPage = (props: Props) => {
   // Kiểm tra và xử lý content
   const validContent = Array.isArray(content) ? content : [];
   function combineMessages(content: any, messages: any) {
-    return [...content, ...messages].sort((a, b) => b.timestamp - a.timestamp);
+    return [...content, ...messages]
+      .filter(
+        (
+          message,
+          index,
+          self // Loại bỏ tin nhắn trùng lặp
+        ) => index === self.findIndex((m) => m.id === message.id)
+      )
+      .sort((a, b) => b.timestamp - a.timestamp);
   }
-  // console.log(messages);
 
   const allMessages = combineMessages(validContent, messages); //combine messages from SWR and WebSocket
 
+  // console.log("allMessages", allMessages);
+  // console.log("content", content);
+  // console.log("messages", messages);
   return (
     <>
       <ConversationContainer>
@@ -48,6 +57,7 @@ const ConversationDetailPage = (props: Props) => {
           handleSendMessage={sendMessage}
           conversationId={conversationId}
           currentUserId={currentUserId}
+
         />
       </ConversationContainer>
     </>

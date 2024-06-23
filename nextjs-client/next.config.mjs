@@ -16,6 +16,12 @@ const nextConfig = {
 				protocol: 'https',
 				hostname: 'lh3.googleusercontent.com',
 			},
+			{
+				protocol: 'http',
+				hostname: 'localhost',
+				port: "8080",
+				pathname: '/chatterbox-system/**',
+			}
 		],
 	},
 };

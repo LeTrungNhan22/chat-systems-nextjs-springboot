@@ -6,12 +6,13 @@ import { useCookies } from "next-client-cookies";
 
 import getMessageById from "@/hooks/api/getMessageById";
 import { ACCESS_TOKEN, WEBSOCKET_ENDPOINT } from "@/constants";
-import { MessageRequest } from "../_types/MessageTypes";
 
 interface WebSocketContextValue {
   messages: any[];
-  sendMessage: (message: MessageRequest, conversationId: string) => void;
+  setMessages: (messages: any[]) => void;
+  sendMessage: (message: any, conversationId: string) => void;
   setChatId: (chatId: string) => void;
+  reconnectWs: () => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextValue | undefined>(
@@ -32,29 +33,41 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     const client = new Client({
       brokerURL: WEBSOCKET_ENDPOINT,
       webSocketFactory: () => socket,
-      debug: (str) => {
-        console.log(str);
-      },
-      heartbeatIncoming: 30000,
-      heartbeatOutgoing: 30000,
       connectHeaders: {
         Authorization: `Bearer ${storage.get(ACCESS_TOKEN)}`,
       },
+      debug: (str) => {
+        console.log(str);
+      },
+      heartbeatIncoming: 20000,
+      heartbeatOutgoing: 20000,
+      maxWebSocketChunkSize: 1024 * 1024 * 10, // 10MB
+      reconnectDelay: 3000,
+      splitLargeFrames: true,
+
     });
 
     client.onConnect = (frame) => {
       console.log("Connected to STOMP " + frame);
+      setMessages([]); // Reset messages khi kết nối lại WebSocket
       if (stompClient && chatId) {
         client.subscribe(`/topic/chats/${chatId}`, (message) => {
           const newMessageResponse = JSON.parse(message.body);
+          console.log("Received message: ", newMessageResponse);
           fetchAndAddMessage(newMessageResponse.messageId);
         });
       }
     };
 
     client.onStompError = (frame) => {
-      console.error("Broker reported error: " + frame.headers["message"]);
-      console.error("Additional details: " + frame.body);
+      if (frame.headers['message'] === 'Payload exceeded') {
+        // Xử lý khi tin nhắn vượt quá giới hạn
+        console.error('Message size exceeded limit');
+      } else {
+        // Xử lý các lỗi khác
+        console.error("Broker reported error: " + frame.headers["message"]);
+        console.error("Additional details: " + frame.body);
+      }
     };
 
     client.activate(); // Kích hoạt kết nối Stomp
@@ -71,14 +84,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   async function fetchAndAddMessage(messageId: string) {
     try {
       const messageFromApi = await getMessageById(messageId); // Hàm này sẽ gọi API của bạn để lấy chi tiết tin nhắn
-
-      setMessages((prev) => [...prev, messageFromApi]); // Cập nhật state messages
+      setMessages((prevMessages) => {
+        return [...prevMessages, messageFromApi];
+      });
     } catch (error) {
       console.error("Error fetching message:", error); // Xử lý lỗi nếu có
     }
   }
 
-  const sendMessage = (messageRequest: MessageRequest, chatId: string) => {
+  const sendMessage = (messageRequest: any, chatId: string) => {
     if (stompClient) {
       console.info("send to chat id :", chatId);
       const token = storage.get(ACCESS_TOKEN);
@@ -88,12 +102,23 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
+      }
+
+      );
+    }
+  };
+
+  const reconnectWs = () => {
+    if (stompClient) {
+      stompClient.deactivate();
+      stompClient.activate();
     }
   };
 
   return (
-    <WebSocketContext.Provider value={{ messages, setChatId, sendMessage }}>
+    <WebSocketContext.Provider
+      value={{ messages, setChatId, sendMessage, setMessages, reconnectWs }}
+    >
       {children}
     </WebSocketContext.Provider>
   );

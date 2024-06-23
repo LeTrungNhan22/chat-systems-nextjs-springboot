@@ -85,7 +85,6 @@ public class SecurityConfig {
                         "/swagger-ui.html",
                         "/ws/**"
 
-
                 )
                 .permitAll()
                 .requestMatchers("/auth/**", "/oauth2/**","ws/**")

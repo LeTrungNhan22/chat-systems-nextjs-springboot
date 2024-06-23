@@ -11,11 +11,19 @@ spring:
             scope:
               - email
               - profile
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 #context-path: /api
 server:
   port: 8080
   servlet:
     context-path: /chatterbox-system
+
+#multipart configuration
+
+
 
 
 

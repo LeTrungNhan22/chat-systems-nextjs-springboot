@@ -12,7 +12,6 @@ public class MongoCustomConfig implements InitializingBean {
     @Autowired
     private MappingMongoConverter mongoConverter;
 
-
     @Override
     public void afterPropertiesSet() throws Exception {
         mongoConverter.setTypeMapper(new DefaultMongoTypeMapper(null)); // No _class in document

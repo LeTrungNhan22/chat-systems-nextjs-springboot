@@ -1,11 +1,22 @@
 // message request
 
-interface MessageRequest {
+interface MessageRequestWithText {
   chatId: string | string[];
   content: string;
-  messageType: "TEXT" | "IMAGE" | "VIDEO" | "FILE";
+  messageType: string;
   mediaBase64: string;
   keywords: string[];
+}
+
+interface MessageRequestWithImage {
+  chatId: string | string[];
+  content: string;
+  messageType: string;
+  chunkIndex: number;
+  totalChunks: number;
+  mediaBase64: string;
+  keywords: string[];
+  messageId: string;
 }
 
 interface MessageSocketResponse {
@@ -18,4 +29,8 @@ interface MessageSocketResponse {
   messageType: string;
 }
 
-export type { MessageSocketResponse, MessageRequest };
+export type {
+  MessageSocketResponse,
+  MessageRequestWithImage,
+  MessageRequestWithText,
+};

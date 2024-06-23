@@ -1,7 +1,6 @@
 package com.snow.oauth2.socialoauth2.model.chat;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.snow.oauth2.socialoauth2.model.user.User;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -18,7 +17,7 @@ public class Message {
     @DBRef
     private User sender;
     private String messageContent;
-    private String mediaUrl;
+    private List<String> mediaUrl;
     private long timestamp;
     private MessageStatus status;
     private MessageType messageType;
@@ -26,5 +25,6 @@ public class Message {
     private Chat chat;
     private List<String> keywords;  // Trường mới để lưu trữ các từ khóa quan trọng (để tìm kiếm nhanh hơn)
     private boolean isEdited;
+    private boolean isSaved;
 
 }

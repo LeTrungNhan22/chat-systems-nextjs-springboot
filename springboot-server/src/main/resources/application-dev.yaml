@@ -1,4 +1,4 @@
-# The configuration for the OAuth2 client
+# The configuration for the developer client
 app:
   tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
   tokenExpirationMsec: 864000000
@@ -12,4 +12,3 @@ logging:
           socket=DEBUG:
         data:
           redis=DEBUG:
-#Redis configuration

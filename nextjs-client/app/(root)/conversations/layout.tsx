@@ -13,7 +13,8 @@ type Props = React.PropsWithChildren<{}>;
 const ConversationLayout = ({ children }: Props) => {
   const user = React.useContext(AuthContext);
   const currentUserId = user?.user?.user.id;
-  const { data, isError, isLoading  } = useListConversationsByUseId(currentUserId);
+  const { data, isError, isLoading } =
+    useListConversationsByUseId(currentUserId);
 
   {
     isLoading && <p>{HANDLE_PENDING}</p>;

@@ -16,4 +16,6 @@ public interface MessageService {
     Page<Message> findByChatId(String chatId, Pageable pageable);
 
     Message findById(String id);
+
+//    void processImageChunk(String chatId, ImageChunkDto chunkDto, String authorizationHeader) throws JsonProcessingException;
 }

@@ -13,7 +13,8 @@ type Props = {
 const MessageItems = ({ message, currentUserId }: Props) => {
   const { chat, sender, messageType } = message;
   const fromCurrentUser = currentUserId === sender?.id;
-  const formattedDate = format(new Date(message.timestamp), "HH:mm");
+  const formattedDateToday = format(new Date(message.timestamp), "HH:mm");
+  const formattedDate = format(new Date(message.timestamp), "dd/MM/yyyy HH:mm");
   const lastMessageByUser = chat?.lastMessageByUser?.sender?.id === sender?.id;
 
   // console.log("message", message);
@@ -34,7 +35,7 @@ const MessageItems = ({ message, currentUserId }: Props) => {
       >
         <div
           className={cn(
-            "px-4 py-2 rounded-lg  min-w-0  max-w-[70%] shadow-md",
+            "px-4 py-2 rounded-lg min-w-0 max-w-[70%] shadow-md break-words",
             {
               "bg-primary text-primary-foreground": fromCurrentUser,
               "bg-gradient text-secondary-foreground ": !fromCurrentUser,

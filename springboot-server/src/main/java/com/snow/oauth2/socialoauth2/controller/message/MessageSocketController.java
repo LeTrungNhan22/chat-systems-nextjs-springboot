@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class MessageSocketController {
 
+
     private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
     private final MessageService messageService;

@@ -14,8 +14,12 @@ public class MessageRequestDto {
     private String content;
     @JsonProperty("messageType")
     private MessageType messageType;
-    @JsonProperty("mediaBase64")
-    private String mediaBase64;
+    @JsonProperty("mediaUrl")
+    private List<String> mediaUrl;
+    @JsonProperty("chunkIndex")
+    private int chunkIndex;
+    @JsonProperty("totalChunks")
+    private int totalChunks;
     @JsonProperty("keywords")
     private List<String> keywords;
 }

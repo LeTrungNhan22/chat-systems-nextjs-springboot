@@ -18,6 +18,7 @@ import org.springframework.web.socket.client.standard.WebSocketContainerFactoryB
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.List;
@@ -89,8 +90,15 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     public WebSocketContainerFactoryBean createWebSocketContainer() {
         WebSocketContainerFactoryBean container = new WebSocketContainerFactoryBean();
         container.setMaxSessionIdleTimeout(60000L); // 1 minute
+        container.setMaxBinaryMessageBufferSize(1024000); // 1MB
+        container.setMaxTextMessageBufferSize(1024000); // 1MB
         return container;
     }
 
-
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+        registry.setMessageSizeLimit(10 * 1024 * 1024); // 10MB
+        registry.setSendTimeLimit(20 * 1000); // 20 seconds
+        registry.setSendBufferSizeLimit(2 * 1024 * 1024); // 2MB
+    }
 }
