@@ -4,7 +4,7 @@ interface MessageRequestWithText {
   chatId: string | string[];
   content: string;
   messageType: string;
-  mediaBase64: string;
+  mediaUrl: string[];
   keywords: string[];
 }
 
@@ -14,7 +14,7 @@ interface MessageRequestWithImage {
   messageType: string;
   chunkIndex: number;
   totalChunks: number;
-  mediaBase64: string;
+  mediaUrl: string[];
   keywords: string[];
   messageId: string;
 }
@@ -23,7 +23,7 @@ interface MessageSocketResponse {
   messageId: string;
   senderId: string;
   messageContent: string;
-  mediaUrl: string;
+  mediaUrl: string[];
   timestamp: string;
   status: string;
   messageType: string;

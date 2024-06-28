@@ -11,6 +11,8 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { useListConversationsByUseId } from "@/hooks/swr/conversation-api/useListConversationByUserId";
 import { MessageRequestWithText } from "../../../_types/MessageTypes";
 import UploadImage from "./UploadImage";
+import axios from "axios";
+import { API_BASE_URL } from "@/constants";
 
 type Props = {
   handleSendMessage: (message: MessageRequestWithText, conversationId: string) => void | any; // Thêm handleSendMessage vào Props
@@ -29,27 +31,35 @@ const ChatInput = ({
     useListConversationsByUseId(currentUserId);
   const [selectedImages, setSelectedImages] = useState<any[]>([]); // Thêm state để lưu ảnh đã chọn
   const [messageContent, setMessageContent] = useState(""); // Thêm state để lưu nội dung tin nhắn
-  const [imageLoadingProgress, setImageLoadingProgress] = useState<number>(13);
 
   const {
     data: imageData,
-    isLoading: uploadImageLoading,
-    error: uploadImageError,
+    progress,
+    isLoading,
     uploadImage: uploadImageFunc } = usePostImage();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async () => {
     let messageType = "TEXT";
-    let mediaBase64 = "";
 
-    if (selectedImages) {
+    if (selectedImages.length > 0) {
       messageType = "IMAGE";
-      // handle image
+      const messageRequestWithImage = {
+        content: messageContent,
+        chatId: conversationId,
+        mediaUrl: selectedImages.map((img) => img.url),
+        messageType: messageType,
+        keywords: []
+      };
+      handleSendMessage(messageRequestWithImage, conversationId as string);
     }
+
+    console.log("messageType", messageType);
+    
     if (messageType === 'TEXT') {
       const messageRequest: MessageRequestWithText = {
         content: messageContent,
         chatId: conversationId,
-        mediaBase64: "",
+        mediaUrl: [],
         messageType: messageType,
         keywords: []
       };
@@ -66,9 +76,23 @@ const ChatInput = ({
     if (files && files.length > 0) {
       // Convert FileList to File[]
       const fileListArray = Array.from(files);
-      await uploadImageFunc(fileListArray);
+      const res = await uploadImageFunc(fileListArray);
     }
+
+    event.target.value = ""; // Reset input file
+
   };
+
+  const handleRemoveImageUploaded = async (id: string) => {
+    try {
+      const res = await axios.delete(`${API_BASE_URL}/images/${id}`)
+      setSelectedImages((prevImages) => prevImages.filter((img) => img.id !== id));
+      console.log(res)
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
 
   useEffect(() => {
     if (imageData) {
@@ -80,7 +104,7 @@ const ChatInput = ({
     }
   }, [imageData]);
 
-  console.log(selectedImages);
+  console.log("selectedImages", selectedImages);
 
 
   return (
@@ -90,9 +114,12 @@ const ChatInput = ({
           selectedImages.map((item) => (
             <UploadImage
               key={item?.id}
+              imageId={item?.id}
               data={item?.url}
+              isLoading={isLoading}
               alt="image"
-              imageLoadingProgress={imageLoadingProgress}
+              progress={progress}
+              handleRemoveImageUploaded={handleRemoveImageUploaded}
             />
           ))
         }
@@ -154,7 +181,7 @@ const ChatInput = ({
               type="submit"
               size="icon"
               disabled={
-                (messageContent === "" && selectedImages.length > 0) ||
+                (messageContent === "" && selectedImages.length <= 0) ||
                 form.formState.isSubmitting
               } // Disable button khi messageContent và selectedImage đều rỗng
             >

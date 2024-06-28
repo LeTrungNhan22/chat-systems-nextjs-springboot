@@ -4,6 +4,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import React from "react";
 
 import { format } from "date-fns";
+import Image from "next/image";
+import { API_BASE_URL } from "@/constants";
+import { Card } from "@/components/ui/card";
 
 type Props = {
   message: any;
@@ -17,9 +20,8 @@ const MessageItems = ({ message, currentUserId }: Props) => {
   const formattedDate = format(new Date(message.timestamp), "dd/MM/yyyy HH:mm");
   const lastMessageByUser = chat?.lastMessageByUser?.sender?.id === sender?.id;
 
-  // console.log("message", message);
-  // console.log("message", message);
-  // console.log("currentUserId", fromCurrentUser);
+  console.log("message", message);
+  console.log("currentUserId", fromCurrentUser);
 
   return (
     <div
@@ -48,8 +50,30 @@ const MessageItems = ({ message, currentUserId }: Props) => {
             <p className="text-wrap break-words whitespace-pre-wrap">
               {message?.messageContent}
             </p>
-          ) : null}
+          ) : messageType === "IMAGE" ? (
+            <>
+              <Card className="flex gap-2 p-2">
+                {message?.mediaUrl && (
+                  message?.mediaUrl.map((item: any) => (
+                    <div key={item?.split("/").pop()} className="relative h-[100px] w-[100px]">
+                      <Image
+                        src={`${API_BASE_URL}${item}`}
 
+                        alt={item}
+                        fill
+                        className="object-cover rounded-md"
+                        placeholder="blur"
+                        sizes="100px"
+                        blurDataURL={`${API_BASE_URL}${item}`}
+
+                      />
+                    </div>
+
+                  ))
+                )}
+              </Card>
+            </>
+          ) : (null)}
           <p
             className={cn("text-xs flex w-full my-1", {
               "text-primary-foreground justify-end": fromCurrentUser,

@@ -105,12 +105,26 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void deleteImage(String imageId) {
+        GridFSFile gridFSFile = gridFSBucket.find(new Document("_id", new ObjectId(imageId))).first();
+        if (gridFSFile == null) {
+            throw new RuntimeException("Image not found with imageId: " + imageId);
+        }
+
+        String fileName = (String) gridFSFile.getMetadata().get("filename");
+        String imageKey = "image:" + fileName;
+
+        // 2. Xóa hình ảnh từ MongoDB GridFS
         gridFSBucket.delete(new ObjectId(imageId));
+
+        // 3. Xóa thông tin liên quan đến hình ảnh trên Redis
+        jedis.del(imageKey); // Xóa imageId
+        jedis.del("views:" + imageKey); // Xóa số lượt xem của ảnh
+
     }
 
     public boolean isPopularImage(String fileName) {
         String imageKey = "image:" + fileName;
         long views = Long.parseLong(jedis.get("views:" + imageKey));
-        return views >= 1000;
+        return views >= 50;
     }
 }

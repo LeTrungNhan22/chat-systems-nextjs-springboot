@@ -1,15 +1,19 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import { HANDLE_ERROR, HANDLE_PENDING } from "@/constants";
 import useFilteredConversations from "@/hooks/common/useFilteredConversations";
 import Link from "next/link";
 import React from "react";
 type Props = {
   conversationsList: any | [];
   currentUserId: string | undefined;
+  isError: boolean
+  isLoading: boolean
 };
 
-const DMConversations = ({ conversationsList, currentUserId }: Props) => {
+const DMConversations = ({ conversationsList, currentUserId, isError,
+  isLoading }: Props) => {
   const filteredConversationsList = useFilteredConversations(
     conversationsList,
     currentUserId
@@ -22,6 +26,14 @@ const DMConversations = ({ conversationsList, currentUserId }: Props) => {
   // console.log("filteredConversationsList", filteredConversationsList);
   // console.log("lastMessageByUser", filteredConversations);
   // console.log("fromCurrentUser", fromCurrentUser);
+
+
+  {
+    if (isLoading) return <p>{HANDLE_PENDING}</p>
+  }
+  {
+    if (isError) return <p>{HANDLE_ERROR}</p>
+  }
 
   return (
     <>
@@ -51,16 +63,14 @@ const DMConversations = ({ conversationsList, currentUserId }: Props) => {
                       <h4 className="truncate">{participant.username}</h4>
                       <p className="text-sm text-muted-foreground truncate italic">
                         {chat.lastMessageByUser?.senderId.id === currentUserId
-                          ? `${
-                              chat.lastMessageByUser?.content === null
-                                ? `"Chưa có tin nhắn!!!"`
-                                : `Bạn: ${chat.lastMessageByUser?.content}`
-                            }`
-                          : `${
-                              chat.lastMessageByUser?.content === null
-                                ? "Chưa có tin nhắn !!!"
-                                : `${chat.lastMessageByUser?.senderId.target.username}: ${chat.lastMessageByUser?.content}`
-                            }`}
+                          ? `${chat.lastMessageByUser?.content === null
+                            ? `"Chưa có tin nhắn!!!"`
+                            : `Bạn: ${chat.lastMessageByUser?.content}`
+                          }`
+                          : `${chat.lastMessageByUser?.content === null
+                            ? "Chưa có tin nhắn !!!"
+                            : `${chat.lastMessageByUser?.senderId.target.username}: ${chat.lastMessageByUser?.content}`
+                          }`}
                       </p>
                     </div>
                   </div>

@@ -13,15 +13,8 @@ type Props = React.PropsWithChildren<{}>;
 const ConversationLayout = ({ children }: Props) => {
   const user = React.useContext(AuthContext);
   const currentUserId = user?.user?.user.id;
-  const { data, isError, isLoading } =
-    useListConversationsByUseId(currentUserId);
-
-  {
-    isLoading && <p>{HANDLE_PENDING}</p>;
-  }
-  {
-    isError && <p>{HANDLE_ERROR}</p>;
-  }
+  const { data, isError, isLoading } =  useListConversationsByUseId(currentUserId);
+  
 
   return (
     <>
@@ -32,6 +25,8 @@ const ConversationLayout = ({ children }: Props) => {
             <DMConversations
               conversationsList={data}
               currentUserId={currentUserId}
+              isError={isError}
+              isLoading={isLoading}
             />
           )}
         </ItemList>

@@ -52,7 +52,7 @@ public class MessageServiceImpl implements MessageService {
 
         // Chỉ xử lý và lưu media khi là ảnh hoặc video và message đã được lưu
         if ((messageRequestDto.getMessageType() == MessageType.IMAGE || messageRequestDto.getMessageType() == MessageType.VIDEO) && message.getId() != null) {
-            processMediaContent(messageRequestDto, chat, message);
+            message.setMediaUrl(messageRequestDto.getMediaUrl());
         }
         processChatLastMessage(messageRequestDto, currentUser, message, chat);
         chatRepository.save(chat);
@@ -118,24 +118,10 @@ public class MessageServiceImpl implements MessageService {
         if (messageRequestDto.getMessageType() == MessageType.TEXT) {
             message.setMessageContent(messageRequestDto.getContent());
         }
+        if (messageRequestDto.getMessageType() == MessageType.IMAGE || messageRequestDto.getMessageType() == MessageType.VIDEO) {
+            message.setMediaUrl(messageRequestDto.getMediaUrl());
+        }
         return message;
-    }
-
-    private void processMediaContent(MessageRequestDto messageRequestDto, Chat chat, Message message) {
-//        if (messageRequestDto.getMediaBase64().length() > MAX_MEDIA_SIZE) {
-//            throw new MediaSizeLimitExceededException("Media size exceeds the limit of 10MB");
-//        }
-//
-//        String mediaUrl = redisService.appendMediaChunk(chat, messageRequestDto, message);
-//        if (mediaUrl != null) {
-//            // Update the existing message with the media URL
-//            message.setMediaUrl(mediaUrl);
-//            messageRepository.save(message);
-//            redisService.deleteMediaChunks(chat, messageRequestDto);
-//        } else {
-//            // If not all chunks received, don't save the message yet
-//            messageRepository.delete(message);
-//        }
     }
 
 

@@ -1,66 +1,48 @@
-
-import { API_BASE_URL } from "@/constants";
-import axios from "axios";
-import useSWR from "swr";
-import { useCookies } from "next-client-cookies";
+// usePostImage.ts
+import axios, { AxiosProgressEvent } from "axios";
 import { useState } from "react";
 
-
-
-const fetcher = async (url: string, formData: FormData) => {
-	const response = await axios(url, {
-		method: "POST",
-		headers: {
-			"Content-Type": "multipart/form-data",
-		},
-		data: formData
-	})
-	return response.data;
-}
+import { API_BASE_URL } from "@/constants";
 
 export const usePostImage = () => {
-	const [progress, setProgress] = useState<number>(0);
-	const { data, error, mutate, isLoading } = useSWR(
-		[`${API_BASE_URL}/images/upload`], // Key bao gồm URL và dữ liệu ban đầu là null
-		fetcher,
-		{
-			revalidateOnFocus: false, // Không tự động revalidate khi focus vào window
-			revalidateOnReconnect: false, // Không tự động revalidate khi kết nối lại
-			shouldRetryOnError: false, // Không tự động retry khi có lỗi
-			
-		}
-	);
+  const [progress, setProgress] = useState(0);
+  const [imageData, setImageData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false); // Thêm state isLoading
 
-	const uploadImage = async (images: File[]) => {
-		const formData = new FormData();
-		images.forEach((image) => {
-			formData.append("images", image); 
-		});
+  const uploadImage = async (images: File[]) => {
+    const formData = new FormData();
+    images.forEach((image) => {
+      formData.append("images", image);
+    });
 
-		try {
-			await mutate(
-				async () => {
-					const result = await fetcher(`${API_BASE_URL}/images/upload`, 
-						formData,
-					
-					);
-					return result; // Cập nhật data với kết quả mới
-				},
-				{
-					optimisticData: data, // Dữ liệu tạm thời trong khi chờ kết quả thực
-					rollbackOnError: true, // Quay lại dữ liệu cũ nếu có lỗi
-				},
-			);
-		} catch (error) {
-			// Xử lý lỗi ở đây
-			console.error(error);
-		}
-	};
+    setIsLoading(true); // Bắt đầu tải lên
 
-	return {
-		data,
-		error,
-		isLoading,
-		uploadImage,
-	};
+    try {
+      const response = await axios.post(`${API_BASE_URL}/images/upload`, formData, {
+        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+          const progressLoaded = progressEvent.loaded;
+          const progressTotal = progressEvent.total;
+          if (progressTotal && progressLoaded) {
+            const percentCompleted = Math.round((progressLoaded / progressTotal) * 100);
+            setProgress(percentCompleted);
+          }
+        },
+      });
+
+      setImageData(response.data);
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setProgress(0);
+      setIsLoading(false); // Kết thúc tải lên
+    }
+  };
+
+  return {
+    data: imageData,
+    isLoading, // Trả về isLoading
+    progress,
+    uploadImage,
+  };
 };

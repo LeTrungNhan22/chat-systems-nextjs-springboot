@@ -13,9 +13,7 @@ export const useListConversationsByUseId = (currentUserId: any) => {
     error,
     mutate: mutateListConversations,
   } = useSWR(`${API_BASE_URL}/conversations/user/${currentUserId}`, fetcher, {
-    revalidateOnFocus: true,
-    revalidateOnReconnect: true,
-    refreshWhenOffline: true,
+    revalidateOnFocus: false,
   });
 
   return {
