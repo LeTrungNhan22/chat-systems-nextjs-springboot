@@ -51,7 +51,7 @@ class SocialApplicationTests {
         messageRequestDto.setChatId("123");
         messageRequestDto.setContent("Hello");
         messageRequestDto.setMessageType(MessageType.TEXT);
-        messageRequestDto.setMediaBase64(null);
+        messageRequestDto.setMediaUrl(null);
         messageRequestDto.setKeywords(List.of("hello"));
 
 
