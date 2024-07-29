@@ -1,9 +1,7 @@
 package com.snow.oauth2.socialoauth2.service.redis;
 
 import com.snow.oauth2.socialoauth2.dto.request.chat.MessageRequestDto;
-import com.snow.oauth2.socialoauth2.exception.message.MediaProcessingException;
 import com.snow.oauth2.socialoauth2.model.chat.Chat;
-import com.snow.oauth2.socialoauth2.model.chat.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

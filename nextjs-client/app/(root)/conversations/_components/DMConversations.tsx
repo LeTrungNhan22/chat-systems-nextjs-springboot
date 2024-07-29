@@ -64,12 +64,25 @@ const DMConversations = ({ conversationsList, currentUserId, isError,
                       <p className="text-sm text-muted-foreground truncate italic">
                         {chat.lastMessageByUser?.senderId.id === currentUserId
                           ? `${chat.lastMessageByUser?.content === null
-                            ? `"Chưa có tin nhắn!!!"`
-                            : `Bạn: ${chat.lastMessageByUser?.content}`
+                            ? `" Chưa có tin nhắn!!!"`
+                            : (chat.lastMessageByUser?.type === "IMAGE"
+                              ?
+                              " Bạn đã gửi một hình ảnh"
+                              : (chat.lastMessageByUser?.type === "FILE"
+                                ? " Bạn đã gửi một tệp" :
+                                `Bạn: ${chat.lastMessageByUser?.content}`))
                           }`
                           : `${chat.lastMessageByUser?.content === null
                             ? "Chưa có tin nhắn !!!"
-                            : `${chat.lastMessageByUser?.senderId.target.username}: ${chat.lastMessageByUser?.content}`
+                            : (
+                              chat.lastMessageByUser?.type === "IMAGE"
+                                ?
+                                `${chat.lastMessageByUser?.senderId.target.username} : 
+                                " Đã gửi một hình ảnh"`
+                                : (chat.lastMessageByUser?.type === "FILE"
+                                  ? " Đã gửi một tệp" :
+                                  ` ${chat.lastMessageByUser?.senderId.target.username}:${chat.lastMessageByUser?.content}`)
+                            )
                           }`}
                       </p>
                     </div>

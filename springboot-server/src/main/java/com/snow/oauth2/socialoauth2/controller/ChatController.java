@@ -3,13 +3,11 @@ package com.snow.oauth2.socialoauth2.controller;
 import com.snow.oauth2.socialoauth2.dto.mapper.ChatMapper;
 import com.snow.oauth2.socialoauth2.dto.request.chat.ChatDto;
 import com.snow.oauth2.socialoauth2.model.chat.Chat;
-import com.snow.oauth2.socialoauth2.model.chat.Message;
 import com.snow.oauth2.socialoauth2.service.chat.ChatService;
 import com.snow.oauth2.socialoauth2.service.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

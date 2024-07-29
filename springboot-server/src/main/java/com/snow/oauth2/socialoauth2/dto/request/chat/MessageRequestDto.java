@@ -1,7 +1,7 @@
 package com.snow.oauth2.socialoauth2.dto.request.chat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.snow.oauth2.socialoauth2.model.chat.MessageType;
+import com.snow.oauth2.socialoauth2.model.message.MessageType;
 import lombok.Data;
 
 import java.util.List;

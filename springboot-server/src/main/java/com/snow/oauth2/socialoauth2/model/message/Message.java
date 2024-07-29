@@ -1,6 +1,7 @@
-package com.snow.oauth2.socialoauth2.model.chat;
+package com.snow.oauth2.socialoauth2.model.message;
 
 
+import com.snow.oauth2.socialoauth2.model.chat.Chat;
 import com.snow.oauth2.socialoauth2.model.user.User;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -24,6 +25,7 @@ public class Message {
     @DBRef
     private Chat chat;
     private List<String> keywords;  // Trường mới để lưu trữ các từ khóa quan trọng (để tìm kiếm nhanh hơn)
+    private List<Emoji> emojis;
     private boolean isEdited;
     private boolean isSaved;
 

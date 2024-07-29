@@ -1,7 +1,7 @@
 package com.snow.oauth2.socialoauth2;
 
 import com.snow.oauth2.socialoauth2.dto.request.chat.MessageRequestDto;
-import com.snow.oauth2.socialoauth2.model.chat.MessageType;
+import com.snow.oauth2.socialoauth2.model.message.MessageType;
 import com.snow.oauth2.socialoauth2.service.message.MessageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

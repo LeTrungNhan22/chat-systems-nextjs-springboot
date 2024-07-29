@@ -1,4 +1,4 @@
-package com.snow.oauth2.socialoauth2.model.chat;
+package com.snow.oauth2.socialoauth2.model.message;
 
 public enum MessageType {
     TEXT,

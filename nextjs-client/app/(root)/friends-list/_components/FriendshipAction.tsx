@@ -44,7 +44,6 @@ const FriendshipAction = ({ currentUserId, otherUserId }: Props) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary">
-            <span className="sr-only">Actions</span>
             <DotsHorizontalIcon className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>

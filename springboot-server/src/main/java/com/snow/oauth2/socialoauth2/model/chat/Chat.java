@@ -14,7 +14,6 @@ import java.util.Map;
 @Data
 @Document(collection = "chats")
 public class Chat {
-
     @Id
     private String id;
     @DBRef(lazy = true)

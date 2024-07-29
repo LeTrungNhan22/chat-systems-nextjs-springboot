@@ -5,6 +5,9 @@ import com.snow.oauth2.socialoauth2.dto.response.MessageResponseDto;
 import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
 import com.snow.oauth2.socialoauth2.model.chat.*;
+import com.snow.oauth2.socialoauth2.model.message.Message;
+import com.snow.oauth2.socialoauth2.model.message.MessageStatus;
+import com.snow.oauth2.socialoauth2.model.message.MessageType;
 import com.snow.oauth2.socialoauth2.model.user.User;
 import com.snow.oauth2.socialoauth2.repository.ChatRepository;
 import com.snow.oauth2.socialoauth2.repository.MessageRepository;
@@ -124,7 +127,6 @@ public class MessageServiceImpl implements MessageService {
         return message;
     }
 
-
     private void sendMessageViaWebSocket(String chatId, MessageResponseDto responseDto) {
         try {
             messagingTemplate.convertAndSend("/topic/chats/" + chatId, responseDto);
@@ -144,7 +146,6 @@ public class MessageServiceImpl implements MessageService {
         responseDto.setMessageType(message.getMessageType());
         return responseDto;
     }
-
 
     private String getJwtFromRequest(String authorizationHeader) {
         if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {

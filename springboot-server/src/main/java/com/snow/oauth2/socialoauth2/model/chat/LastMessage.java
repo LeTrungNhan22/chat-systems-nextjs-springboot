@@ -1,6 +1,8 @@
 package com.snow.oauth2.socialoauth2.model.chat;
 
 
+import com.snow.oauth2.socialoauth2.model.message.MessageStatus;
+import com.snow.oauth2.socialoauth2.model.message.MessageType;
 import com.snow.oauth2.socialoauth2.model.user.User;
 import lombok.Builder;
 import lombok.Data;

@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { API_BASE_URL } from "@/constants";
 import { Card } from "@/components/ui/card";
+import MessageItemOption from "./MessageItemOption";
 
 type Props = {
   message: any;
@@ -16,7 +17,7 @@ type Props = {
 const MessageItems = ({ message, currentUserId }: Props) => {
   const { chat, sender, messageType } = message;
   const fromCurrentUser = currentUserId === sender?.id;
-  const formattedDateToday = format(new Date(message.timestamp), "HH:mm");
+  // const formattedDateToday = format(new Date(message.timestamp), "HH:mm");
   const formattedDate = format(new Date(message.timestamp), "dd/MM/yyyy HH:mm");
   const lastMessageByUser = chat?.lastMessageByUser?.sender?.id === sender?.id;
 
@@ -37,7 +38,7 @@ const MessageItems = ({ message, currentUserId }: Props) => {
       >
         <div
           className={cn(
-            "px-4 py-2 rounded-lg min-w-0 max-w-[70%] shadow-md break-words",
+            "px-2 py-2 rounded-lg min-w-0 max-w-[70%] shadow-md break-words",
             {
               "bg-primary text-primary-foreground": fromCurrentUser,
               "bg-gradient text-secondary-foreground ": !fromCurrentUser,
@@ -58,17 +59,14 @@ const MessageItems = ({ message, currentUserId }: Props) => {
                     <div key={item?.split("/").pop()} className="relative h-[100px] w-[100px]">
                       <Image
                         src={`${API_BASE_URL}${item}`}
-
                         alt={item}
                         fill
                         className="object-cover rounded-md"
                         placeholder="blur"
                         sizes="100px"
                         blurDataURL={`${API_BASE_URL}${item}`}
-
                       />
                     </div>
-
                   ))
                 )}
               </Card>
@@ -82,7 +80,11 @@ const MessageItems = ({ message, currentUserId }: Props) => {
           >
             {formattedDate}
           </p>
+
+          
+
         </div>
+
       </div>
 
       <Avatar

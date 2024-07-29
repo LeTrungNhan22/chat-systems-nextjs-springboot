@@ -1,7 +1,7 @@
 package com.snow.oauth2.socialoauth2.dto.response;
 
-import com.snow.oauth2.socialoauth2.model.chat.MessageStatus;
-import com.snow.oauth2.socialoauth2.model.chat.MessageType;
+import com.snow.oauth2.socialoauth2.model.message.MessageStatus;
+import com.snow.oauth2.socialoauth2.model.message.MessageType;
 import lombok.Data;
 
 import java.util.List;
