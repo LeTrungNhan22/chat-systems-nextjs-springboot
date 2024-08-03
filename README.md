@@ -33,7 +33,7 @@
 For any questions or feedback, please contact me at [letrungnhan220801@gmail.com].
 
 # Result
-<img width="926" alt="login-result" src="[https://github.com/LeTrungNhan22/chat-systems-nextjs-springboot/result/find-and-add-friend.png](https://github.com/LeTrungNhan22/chat-systems-nextjs-springboot/blob/main/result/find-and-add-friend.png)">
+<img width="926" alt="login-result" src="https://firebasestorage.googleapis.com/v0/b/image-storage-976a2.appspot.com/o/chatterbox-system-results%2Fsend-byimage-send-by-text.png?alt=media&token=bfd5af1d-9256-4568-a320-72ede1a2c0fc">
 
 <img width="926" alt="last-mesages" src="[https://github.com/htkwon/Capstone-Design/assets/117131575/db832107-6974-41ec-b5f0-6a4b967b9736](https://firebasestorage.googleapis.com/v0/b/image-storage-976a2.appspot.com/o/chatterbox-system-results%2Fresult-last-messages.png?alt=media&token=a59197d5-8dd0-47fc-bca0-032baccafe8f)">
 
