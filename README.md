@@ -34,6 +34,6 @@ For any questions or feedback, please contact me at [letrungnhan220801@gmail.com
 
 # Result
 * **Instant Messaging:** Send and receive text messages in real time.
- (https://github.com/LeTrungNhan22/chat-systems-nextjs-springboot/blob/main/result/find-and-add-friend.png)
+* <img width="926" alt="메인페이지" src="https://github.com/LeTrungNhan22/chat-systems-nextjs-springboot/result/find-and-add-friend.png">
 * **Private Chats:** Create one-on-one conversations with other users. ( kèm hình ảnh )
 [Image of private chat]
