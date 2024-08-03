@@ -16,10 +16,10 @@
     * Typing Indicators
 ## Technologies Used
 
-* **Frontend:** [Frontend Technologies] (NextJs (React))
-* **Backend:** [Backend Technologies] (Java Spring boot)
-* **Real-Time Communication:** [WebSocket Library] (Spring Websocket)
-* **Database:** [Database Technology] (MongoDB)
+* **Frontend:** (NextJs (React))
+* **Backend:** (Java Spring boot)
+* **Real-Time Communication:**  (Spring Websocket)
+* **Database:** (MongoDB)
 
 
 ## Usage
@@ -28,14 +28,12 @@
 2. **Start Chatting:** Choose a contact or group to start a conversation.
 3. **Send Messages:** Type your message and press Enter to send.
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit pull requests or report issues.
-
-## License
-
-This project is licensed under the [License Name] License - see the [LICENSE.md](LICENSE.md) file for details.
-
 ## Contact
 
 For any questions or feedback, please contact me at [letrungnhan220801@gmail.com].
+
+# Result
+* **Instant Messaging:** Send and receive text messages in real time.
+
+* **Private Chats:** Create one-on-one conversations with other users. ( kèm hình ảnh )
+[Image of private chat]
