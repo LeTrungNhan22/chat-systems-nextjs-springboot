@@ -7,7 +7,6 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { API_BASE_URL } from "@/constants";
 import { Card } from "@/components/ui/card";
-import MessageItemOption from "./MessageItemOption";
 
 type Props = {
   message: any;
@@ -21,39 +20,43 @@ const MessageItems = ({ message, currentUserId }: Props) => {
   const formattedDate = format(new Date(message.timestamp), "dd/MM/yyyy HH:mm");
   const lastMessageByUser = chat?.lastMessageByUser?.sender?.id === sender?.id;
 
-  console.log("message", message);
-  console.log("currentUserId", fromCurrentUser);
+  // console.log("message", message);
+  // console.log("currentUserId", fromCurrentUser);
 
   return (
-    <div
-      className={cn("flex items-end", {
-        "justify-end": fromCurrentUser,
-      })}
+    <div className={cn("flex items-end", {
+      "justify-end": fromCurrentUser,
+    })}
     >
-      <div
-        className={cn("flex flex-col w-full mx-2", {
-          "order-1 items-end": fromCurrentUser,
-          "order-1 items-start": !fromCurrentUser,
-        })}
+      <div className={cn("flex flex-col w-full mx-2", {
+        "order-1 items-end": fromCurrentUser,
+        "order-1 items-start": !fromCurrentUser,
+      })}
       >
-        <div
-          className={cn(
-            "px-2 py-2 rounded-lg min-w-0 max-w-[70%] shadow-md break-words",
-            {
-              "bg-primary text-primary-foreground": fromCurrentUser,
-              "bg-gradient text-secondary-foreground ": !fromCurrentUser,
-              "rounded-br-none": !lastMessageByUser && fromCurrentUser,
-              "rounded-bl-none": !lastMessageByUser && !fromCurrentUser,
-            }
-          )}
+        <div className={cn(
+          "px-2 py-2 rounded-lg min-w-0 max-w-[70%] shadow-md break-words",
+          {
+            "bg-primary text-primary-foreground": fromCurrentUser,
+            "bg-gradient text-secondary-foreground ": !fromCurrentUser,
+            "rounded-br-none": !lastMessageByUser && fromCurrentUser,
+            "rounded-bl-none": !lastMessageByUser && !fromCurrentUser,
+          }
+        )}
         >
+          <p className={cn("text-xs flex w-full my-1", {
+            "text-primary-foreground justify-end": fromCurrentUser,
+            "text-secondary-foreground justify-start": !fromCurrentUser,
+          })}
+          >
+            {formattedDate}
+          </p>
           {messageType === "TEXT" ? (
             <p className="text-wrap break-words whitespace-pre-wrap">
               {message?.messageContent}
             </p>
           ) : messageType === "IMAGE" ? (
-            <>
-              <Card className="flex gap-2 p-2">
+            <div className="flex flex-col items-end">
+              <Card className="flex gap-1 p-1 max-w-52">
                 {message?.mediaUrl && (
                   message?.mediaUrl.map((item: any) => (
                     <div key={item?.split("/").pop()} className="relative h-[100px] w-[100px]">
@@ -70,23 +73,13 @@ const MessageItems = ({ message, currentUserId }: Props) => {
                   ))
                 )}
               </Card>
-            </>
+              <p className="text-wrap break-words whitespace-pre-wrap">
+                {message?.messageContent}
+              </p>
+            </div>
           ) : (null)}
-          <p
-            className={cn("text-xs flex w-full my-1", {
-              "text-primary-foreground justify-end": fromCurrentUser,
-              "text-secondary-foreground justify-start": !fromCurrentUser,
-            })}
-          >
-            {formattedDate}
-          </p>
-
-          
-
         </div>
-
       </div>
-
       <Avatar
         className={cn("relative w-8 h-8", {
           "order-2": fromCurrentUser,

@@ -1,6 +1,6 @@
 'use client'
 import Image from "next/image"
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Progress } from "@/components/ui/progress"
 import { API_BASE_URL } from "@/constants"
 
@@ -16,6 +16,7 @@ type Props = {
 
 
 const UploadImage = ({ data, alt, imageId, progress, handleRemoveImageUploaded, isLoading }: Props) => {
+
 	useEffect(() => {
 		console.log("is uploading image:", isLoading);
 	}, [isLoading]); // Log mỗi khi progress thay đổi
@@ -41,8 +42,7 @@ const UploadImage = ({ data, alt, imageId, progress, handleRemoveImageUploaded, 
 							cursor-pointer
 							h-6 w-6 flex items-center justify-center
 							bg-slate-600 shadow-md rounded-md m-0.5
-							hover:bg-red-500 hover:text-white
-								"
+							hover:bg-red-500 hover:text-white"
 				>
 					x
 				</span>

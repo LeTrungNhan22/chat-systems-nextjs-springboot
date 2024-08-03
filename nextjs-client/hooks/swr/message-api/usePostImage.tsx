@@ -22,10 +22,16 @@ export const usePostImage = () => {
         onUploadProgress: (progressEvent: AxiosProgressEvent) => {
           const progressLoaded = progressEvent.loaded;
           const progressTotal = progressEvent.total;
+          console.log("progressLoaded", progressLoaded);
+          console.log("progressTotal", progressTotal);
           if (progressTotal && progressLoaded) {
-            const percentCompleted = Math.round((progressLoaded / progressTotal) * 100);
+            const percentCompleted = Math.round((progressLoaded * 100) / progressLoaded);
+            console.log("percentCompleted", percentCompleted);
+
             setProgress(percentCompleted);
           }
+          console.log("progress", progress);
+
         },
       });
 

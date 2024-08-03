@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 @Service
@@ -22,6 +23,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Autowired
     private GridFSBucket gridFSBucket;
+
 
     @Autowired
     private Jedis jedis;
@@ -51,6 +53,7 @@ public class ImageServiceImpl implements ImageService {
 
         // Xử lý các ảnh chưa có trong Redis
         for (int index : indicesToProcess) {
+            final int currentIndex = index; // Sao chép index vào biến final để sử dụng trong lambda
             Future<String> future = executor.submit(() -> {
                 byte[] imageData = imageDataList.get(index);
                 String fileName = fileNames.get(index);
@@ -70,6 +73,10 @@ public class ImageServiceImpl implements ImageService {
                     ttl = 86400; // Nếu là ảnh phổ biến, tăng TTL lên 1 ngày
                 }
                 jedis.setex("image:" + fileName, ttl, imageIdString);
+
+                // Báo cáo tiến độ sau mỗi ảnh được xử lý
+                double progress = (double) (currentIndex + 1) / imageDataList.size() * 100;
+                jedis.set("uploadProgress", String.valueOf(progress));
 
                 return imageIdString;
             });
@@ -121,6 +128,7 @@ public class ImageServiceImpl implements ImageService {
         jedis.del("views:" + imageKey); // Xóa số lượt xem của ảnh
 
     }
+
 
     public boolean isPopularImage(String fileName) {
         String imageKey = "image:" + fileName;

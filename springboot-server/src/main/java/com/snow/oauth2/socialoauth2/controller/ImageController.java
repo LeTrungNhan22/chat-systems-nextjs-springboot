@@ -10,10 +10,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -23,6 +25,10 @@ public class ImageController {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private Jedis jedis;
+
 
     @PostMapping("/upload")
     @Operation(summary = "Upload images")
@@ -62,6 +68,13 @@ public class ImageController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/upload/progress")
+    public ResponseEntity<Map<String, Object>> getUploadProgress() {
+        String progressString = jedis.get("uploadProgress");
+        double progress = progressString != null ? Double.parseDouble(progressString) : 0.0;
+        return ResponseEntity.ok(Map.of("progress", progress));
     }
 
     @DeleteMapping("/{imageId}")

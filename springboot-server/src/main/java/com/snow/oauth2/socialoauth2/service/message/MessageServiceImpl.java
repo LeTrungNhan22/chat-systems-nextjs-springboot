@@ -4,7 +4,8 @@ import com.snow.oauth2.socialoauth2.dto.request.chat.MessageRequestDto;
 import com.snow.oauth2.socialoauth2.dto.response.MessageResponseDto;
 import com.snow.oauth2.socialoauth2.exception.notfoud.ChatNotFoundException;
 import com.snow.oauth2.socialoauth2.exception.notfoud.UserNotFoundException;
-import com.snow.oauth2.socialoauth2.model.chat.*;
+import com.snow.oauth2.socialoauth2.model.chat.Chat;
+import com.snow.oauth2.socialoauth2.model.chat.LastMessage;
 import com.snow.oauth2.socialoauth2.model.message.Message;
 import com.snow.oauth2.socialoauth2.model.message.MessageStatus;
 import com.snow.oauth2.socialoauth2.model.message.MessageType;
@@ -118,9 +119,7 @@ public class MessageServiceImpl implements MessageService {
         message.setMessageType(messageRequestDto.getMessageType());
         message.setStatus(MessageStatus.SENT);
         message.setTimestamp(System.currentTimeMillis());
-        if (messageRequestDto.getMessageType() == MessageType.TEXT) {
-            message.setMessageContent(messageRequestDto.getContent());
-        }
+        message.setMessageContent(messageRequestDto.getContent());
         if (messageRequestDto.getMessageType() == MessageType.IMAGE || messageRequestDto.getMessageType() == MessageType.VIDEO) {
             message.setMediaUrl(messageRequestDto.getMediaUrl());
         }

@@ -31,7 +31,6 @@ const ChatInput = ({
     useListConversationsByUseId(currentUserId);
   const [selectedImages, setSelectedImages] = useState<any[]>([]); // Thêm state để lưu ảnh đã chọn
   const [messageContent, setMessageContent] = useState(""); // Thêm state để lưu nội dung tin nhắn
-
   const {
     data: imageData,
     progress,
@@ -50,11 +49,13 @@ const ChatInput = ({
         messageType: messageType,
         keywords: []
       };
+      console.log("messageRequestWithImage", messageRequestWithImage);
+      
       handleSendMessage(messageRequestWithImage, conversationId as string);
     }
 
     console.log("messageType", messageType);
-    
+
     if (messageType === 'TEXT') {
       const messageRequest: MessageRequestWithText = {
         content: messageContent,
